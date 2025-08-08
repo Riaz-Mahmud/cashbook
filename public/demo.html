@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>CashBook - Custom CSS Demo</title>
+        <link href="css/app.css" rel="stylesheet">
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    </head>
+    <body class="app-layout">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="flex items-center">
+                    <h1 class="app-logo">CashBook</h1>
+                </div>
+                <nav class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-primary">Get Started</a>
+                    </li>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Sidebar -->
+            <aside class="app-sidebar">
+                <div class="sidebar-section">
+                    <h2 class="sidebar-title">Navigation</h2>
+                    <nav class="sidebar-nav">
+                        <a href="#" class="nav-link active">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            </svg>
+                            Dashboard
+                        </a>
+                        <a href="#" class="nav-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            Books
+                        </a>
+                        <a href="#" class="nav-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            Transactions
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main content -->
+            <main class="app-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Custom CSS Demo</h1>
+                        <p class="page-subtitle">Showcasing the new custom styling system</p>
+                    </div>
+                    <button class="btn btn-primary">New Item</button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card success">
+                        <div class="stat-value">$12,459</div>
+                        <div class="stat-label">Total Income</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-value">$8,239</div>
+                        <div class="stat-label">Total Expenses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$4,220</div>
+                        <div class="stat-label">Net Profit</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">Active Books</div>
+                    </div>
+                </div>
+
+                <!-- Cards Section -->
+                <div class="grid grid-cols-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Form Example</h3>
+                            <p class="card-subtitle">Custom form styling</p>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" class="form-input" placeholder="Enter your name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" placeholder="Enter your email">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-input form-select">
+                                        <option>Choose category</option>
+                                        <option>Income</option>
+                                        <option>Expense</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary">Save</button>
+                            <button class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Components</h3>
+                            <p class="card-subtitle">Various UI components</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h4 style="margin-bottom: 1rem;">Buttons</h4>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button class="btn btn-primary btn-sm">Primary</button>
+                                    <button class="btn btn-secondary btn-sm">Secondary</button>
+                                    <button class="btn btn-success btn-sm">Success</button>
+                                    <button class="btn btn-danger btn-sm">Danger</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 style="margin-bottom: 1rem;">Badges</h4>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <span class="badge badge-primary">Primary</span>
+                                    <span class="badge badge-success">Success</span>
+                                    <span class="badge badge-warning">Warning</span>
+                                    <span class="badge badge-danger">Danger</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 style="margin-bottom: 1rem;">Alerts</h4>
+                                <div class="alert alert-success">Success message here!</div>
+                                <div class="alert alert-error">Error message here!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Example -->
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h3 class="card-title">Data Table</h3>
+                        <p class="card-subtitle">Custom table styling</p>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Amount</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Office Supplies</td>
+                                    <td>$125.00</td>
+                                    <td>Expenses</td>
+                                    <td><span class="badge badge-success">Approved</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Edit</button>
+                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Client Payment</td>
+                                    <td>$2,500.00</td>
+                                    <td>Income</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Edit</button>
+                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

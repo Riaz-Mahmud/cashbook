@@ -1,0 +1,1512 @@
+<x-app-layout>
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">{{ $book->name }}</h1>
+        @if($book->description)
+            <p style="color: var(--gray-600); margin-top: 0.5rem;">{{ $book->description }}</p>
+        @endif
+    </div>
+
+    <!-- Filters and Summary Section -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-body">
+            <!-- Filter Options -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Duration</label>
+                    <select class="form-select" style="font-size: 0.875rem;">
+                        <option value="">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="this_week">This Week</option>
+                        <option value="last_week">Last Week</option>
+                        <option value="this_month">This Month</option>
+                        <option value="last_month">Last Month</option>
+                        <option value="this_year">This Year</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Types</label>
+                    <select class="form-select" style="font-size: 0.875rem;">
+                        <option value="">All</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Members</label>
+                    <select class="form-select" style="font-size: 0.875rem;">
+                        <option value="">All</option>
+                        @foreach($book->business->users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Payment Modes</label>
+                    <select class="form-select" style="font-size: 0.875rem;">
+                        <option value="">All</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="check">Check</option>
+                        <option value="digital_wallet">Digital Wallet</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Categories</label>
+                    <select class="form-select" style="font-size: 0.875rem;">
+                        <option value="">All</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <input type="text" class="form-input" placeholder="Search by remark or amount..." style="font-size: 0.875rem;">
+            </div>
+
+            <!-- Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <!-- Cash In Summary -->
+                <div style="background: linear-gradient(135deg, var(--success-color), #10b981); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                        <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                        </svg>
+                        <span style="font-weight: 600;">Cash In</span>
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                        @php
+                            // Get totals from all transactions, not just paginated ones
+                            $allTransactions = $book->transactions;
+                            $totalIncome = $allTransactions->where('type', 'income')->sum('amount');
+                        @endphp
+                        {{ $activeBusiness->currency }} {{ number_format($totalIncome, 0) }}
+                    </div>
+                    {{-- <div style="font-size: 0.75rem; opacity: 0.9;">Total Income</div> --}}
+                </div>
+
+                <!-- Cash Out Summary -->
+                <div style="background: linear-gradient(135deg, var(--danger-color), #ef4444); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                        <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                        </svg>
+                        <span style="font-weight: 600;">Cash Out</span>
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                        @php
+                            $totalExpense = $allTransactions->where('type', 'expense')->sum('amount');
+                        @endphp
+                        {{ $activeBusiness->currency }} {{ number_format($totalExpense, 0) }}
+                    </div>
+                    {{-- <div style="font-size: 0.75rem; opacity: 0.9;">Total Expense</div> --}}
+                </div>
+
+                <!-- Net Balance Summary -->
+                <div style="background: linear-gradient(135deg, var(--primary-color), #3b82f6); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                        <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                        </svg>
+                        <span style="font-weight: 600;">Net Balance</span>
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                        @php
+                            $netBalance = ($totalIncome ?? 0) - ($totalExpense ?? 0);
+                        @endphp
+                        {{ $activeBusiness->currency }} {{ $netBalance >= 0 ? '' : '-' }}{{ number_format(abs($netBalance), 0) }}
+                    </div>
+                    {{-- <div style="font-size: 0.75rem; opacity: 0.9;">{{ $netBalance >= 0 ? 'Profit' : 'Loss' }}</div> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div x-data="{}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 1rem;">
+            @if($bookRole !== 'viewer')
+            <button @click="$dispatch('open-modal', 'add-transaction'); $nextTick(() => { document.getElementById('type').value = 'income'; document.getElementById('transaction-form').reset(); document.getElementById('type').value = 'income'; })" class="btn btn-success">
+                <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Cash In
+            </button>
+            <button @click="$dispatch('open-modal', 'add-transaction'); $nextTick(() => { document.getElementById('type').value = 'expense'; document.getElementById('transaction-form').reset(); document.getElementById('type').value = 'expense'; })" class="btn btn-danger">
+                <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                </svg>
+                Cash Out
+            </button>
+            @endif
+            @php
+                $userRole = auth()->user()->businesses()->where('business_id', $activeBusiness->id)->value('role');
+            @endphp
+            @if(in_array($userRole, ['owner', 'admin']))
+            <button @click="$dispatch('open-modal', 'manage-users')" class="btn btn-secondary">
+                <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                Manage Users
+            </button>
+            @endif
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 0.875rem; color: var(--gray-500);">{{ $transactions->total() }} total transactions</span>
+        </div>
+    </div>
+
+    <!-- Transactions DataTable -->
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
+            <table id="transactions-table" class="table" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th style="text-align: right;">Amount</th>
+                        <th>Status</th>
+                        <th>User</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTable will populate this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right Side Transaction Detail Modal -->
+    <div id="transaction-detail-modal" class="transaction-detail-modal" style="display: none;">
+        <!-- Modal Backdrop -->
+        <div class="modal-backdrop" onclick="closeTransactionDetail()"></div>
+
+        <!-- Modal Content -->
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h3 id="detail-title">Transaction Details</h3>
+                <button type="button" onclick="closeTransactionDetail()" class="close-btn">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Transaction Info -->
+                <div class="detail-section">
+                    <h4>Transaction Information</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Type</label>
+                            <span id="detail-type" class="badge"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Amount</label>
+                            <span id="detail-amount" class="amount"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Date</label>
+                            <span id="detail-date"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status</label>
+                            <span id="detail-status" class="badge"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Category</label>
+                            <span id="detail-category"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Description</label>
+                            <span id="detail-description"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Receipt Section -->
+                <div class="detail-section" id="receipt-section" style="display: none;">
+                    <h4>Receipt</h4>
+                    <div class="receipt-container">
+                        <a id="receipt-link" href="#" target="_blank" class="btn btn-sm btn-secondary">View Receipt</a>
+                    </div>
+                </div>
+
+                <!-- Activity Timeline -->
+                <div class="detail-section">
+                    <h4>Activity Timeline</h4>
+                    <div id="activity-timeline" class="timeline">
+                        <!-- Timeline items will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Action Buttons -->
+            <div class="modal-footer">
+                <div class="detail-actions">
+                    <button id="edit-transaction-btn" class="btn btn-primary" onclick="editTransactionFromDetail()">
+                        Edit Transaction
+                    </button>
+                    <button id="delete-transaction-btn" class="btn btn-danger" onclick="deleteTransactionFromDetail()">
+                        Delete Transaction
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <x-modal name="add-transaction" :show="false">
+        <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem;">Add New Transaction</h3>
+            <form id="transaction-form" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+                @csrf
+                <input type="hidden" name="book_id" value="{{ $book->id }}">
+                <input type="hidden" name="return_to" value="{{ route('books.show', $book) }}">
+                <input type="hidden" id="transaction_id" name="transaction_id" value="">
+                <input type="hidden" id="form_method" name="_method" value="POST">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="type" class="form-label">Type</label>
+                        <select id="type" name="type" class="form-select" required>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                        <x-input-error :messages="$errors->get('type')" class="mt-2" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input id="amount" name="amount" type="number" step="0.01" min="0.01" class="form-input" required />
+                        <x-input-error :messages="$errors->get('amount')" class="mt-2" />
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="transaction_date" class="form-label">Date & Time</label>
+                        <input id="transaction_date" name="transaction_date" type="datetime-local" class="form-input" value="{{ now()->format('Y-m-d\TH:i') }}" required />
+                        <x-input-error :messages="$errors->get('transaction_date')" class="mt-2" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select id="category_id" name="category_id" class="form-select">
+                            <option value="">Select category</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea id="description" name="description" rows="3" class="form-input" placeholder="Enter transaction description..."></textarea>
+                    <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                </div>
+
+                <div class="form-group">
+                    <label for="receipt" class="form-label">Receipt (optional)</label>
+                    <input id="receipt" name="receipt" type="file" accept="image/*,application/pdf" class="form-input" style="padding: 0.5rem;" />
+                    <x-input-error :messages="$errors->get('receipt')" class="mt-2" />
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem;">
+                    <button type="button" @click="$dispatch('close-modal', 'add-transaction')" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" id="submit-btn" class="btn btn-primary">
+                        Save Transaction
+                    </button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
+
+    <!-- Edit Transaction Modal -->
+    <x-modal name="edit-transaction" :show="false">
+        <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem;">Edit Transaction</h3>
+            <form id="edit-transaction-form" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="book_id" value="{{ $book->id }}">
+                <input type="hidden" id="edit_transaction_id" name="transaction_id" value="">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit_type" class="form-label">Type</label>
+                        <select id="edit_type" name="type" class="form-select" required>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_amount" class="form-label">Amount</label>
+                        <input id="edit_amount" name="amount" type="number" step="0.01" min="0.01" class="form-input" required />
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit_transaction_date" class="form-label">Date & Time</label>
+                        <input id="edit_transaction_date" name="transaction_date" type="datetime-local" class="form-input" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_category_id" class="form-label">Category</label>
+                        <select id="edit_category_id" name="category_id" class="form-select">
+                            <option value="">Select category</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_description" class="form-label">Description</label>
+                    <textarea id="edit_description" name="description" rows="3" class="form-input" placeholder="Enter transaction description..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_receipt" class="form-label">Receipt (optional)</label>
+                    <input id="edit_receipt" name="receipt" type="file" accept="image/*,application/pdf" class="form-input" style="padding: 0.5rem;" />
+                    <div id="current-receipt" style="margin-top: 0.5rem; display: none;">
+                        <span style="font-size: 0.875rem; color: var(--gray-600);">Current receipt: <a id="receipt-link" href="#" target="_blank" style="color: var(--primary-color);">View</a></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem;">
+                    <button type="button" @click="$dispatch('close-modal', 'edit-transaction')" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Update Transaction
+                    </button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
+
+    <!-- Manage Users Modal -->
+    <x-modal name="manage-users" :show="false">
+        <div style="padding: 1.5rem; max-width: 800px;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem;">Manage Book Users</h3>
+
+            <!-- Add User Section -->
+            <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--border-radius); margin-bottom: 1.5rem;">
+                <h4 style="font-size: 1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 1rem;">Add User to Book</h4>
+                <form id="add-user-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Searchable User Input -->
+                    <div class="form-group">
+                        <label for="user_search" class="form-label">Search User</label>
+                        <div style="position: relative;">
+                            <input type="text" id="user_search" placeholder="Type name or email to search..." class="form-input" autocomplete="off" />
+                            <input type="hidden" id="selected_user_id" name="user_id" value="" />
+                            <div id="user_search_results" style="
+                                position: absolute;
+                                top: 100%;
+                                left: 0;
+                                right: 0;
+                                background: white;
+                                border: 1px solid var(--gray-300);
+                                border-top: none;
+                                border-radius: 0 0 var(--border-radius) var(--border-radius);
+                                max-height: 200px;
+                                overflow-y: auto;
+                                z-index: 1000;
+                                display: none;
+                                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                            "></div>
+                        </div>
+                        <div id="selected_user_display" style="
+                            margin-top: 0.5rem;
+                            padding: 0.75rem;
+                            background: var(--success-color);
+                            color: white;
+                            border-radius: var(--border-radius);
+                            font-size: 0.875rem;
+                            display: none;
+                            position: relative;
+                        ">
+                            <span id="selected_user_text"></span>
+                            <button type="button" onclick="clearSelectedUser()" style="
+                                position: absolute;
+                                top: 0.5rem;
+                                right: 0.75rem;
+                                background: none;
+                                border: none;
+                                color: white;
+                                cursor: pointer;
+                                font-size: 1.25rem;
+                                line-height: 1;
+                            ">×</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user_role" class="form-label">Role</label>
+                        <select id="user_role" name="role" class="form-select" required>
+                            <option value="viewer">Viewer - Can only view transactions</option>
+                            <option value="editor">Editor - Can add/edit own transactions</option>
+                            <option value="manager">Manager - Full access to transactions</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" disabled id="add-user-btn">Add User</button>
+                </form>
+            </div>
+
+            <!-- Current Users List -->
+            <div>
+                <h4 style="font-size: 1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 1rem;">Current Users</h4>
+                <div id="users-list" style="space-y: 0.75rem;">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid var(--gray-200); margin-top: 1.5rem;">
+                <button type="button" @click="$dispatch('close-modal', 'manage-users')" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </x-modal>
+
+    <script>
+        // CSRF token for AJAX requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        let dataTable;
+        let currentTransactionId = null;
+
+        // Initialize DataTable
+        $(document).ready(function() {
+            dataTable = $('#transactions-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route("books.transactions.data", $book) }}',
+                    type: 'GET',
+                    data: function(d) {
+                        // Add filter parameters
+                        d.duration = $('select:eq(0)').val();
+                        d.type = $('select:eq(1)').val();
+                        d.member = $('select:eq(2)').val();
+                        d.payment_mode = $('select:eq(3)').val();
+                        d.category = $('select:eq(4)').val();
+                        d.search = $('input[placeholder*="Search"]').val();
+                    }
+                },
+                columns: [
+                    { data: 'transaction_date', name: 'transaction_date' },
+                    { data: 'description', name: 'description' },
+                    { data: 'category', name: 'category.name' },
+                    { data: 'type', name: 'type' },
+                    { data: 'amount', name: 'amount', className: 'text-right' },
+                    { data: 'status', name: 'status' },
+                    { data: 'user', name: 'user.name' },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right' }
+                ],
+                order: [[0, 'desc']],
+                pageLength: 25,
+                responsive: true,
+                language: {
+                    processing: 'Loading transactions...',
+                    emptyTable: 'No transactions found',
+                    zeroRecords: 'No matching transactions found'
+                },
+                drawCallback: function() {
+                    // Add click listeners to table rows
+                    $('#transactions-table tbody tr').off('click').on('click', function(e) {
+                        // Don't trigger if clicking on action buttons
+                        if ($(e.target).closest('button, a').length === 0) {
+                            const data = dataTable.row(this).data();
+                            if (data && data.id) {
+                                showTransactionDetail(data.id);
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Filter event listeners
+            const filterSelects = document.querySelectorAll('.card-body select');
+            const searchInput = document.querySelector('input[placeholder*="Search"]');
+
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    dataTable.ajax.reload();
+                    updateSummaryCards();
+                });
+            });
+
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(function() {
+                    dataTable.ajax.reload();
+                }, 300));
+            }
+        });
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Show transaction detail in right modal
+        function showTransactionDetail(id) {
+            currentTransactionId = id;
+            console.log('Showing transaction detail for ID:', id);
+
+            fetch(`/transactions/${id}/detail`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    populateTransactionDetail(data.transaction, data.activities);
+                    openTransactionDetailModal();
+                } else {
+                    showNotification('Error loading transaction details: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching transaction details:', error);
+                showNotification('Error loading transaction details: ' + error.message, 'error');
+            });
+        }
+
+        // Populate transaction detail modal
+        function populateTransactionDetail(transaction, activities) {
+            // Set basic info
+            document.getElementById('detail-title').textContent = `Transaction #${transaction.id}`;
+
+            // Type badge
+            const typeBadge = document.getElementById('detail-type');
+            typeBadge.textContent = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1);
+            typeBadge.className = `badge ${transaction.type === 'income' ? 'badge-success' : 'badge-danger'}`;
+
+            // Amount
+            const amountElement = document.getElementById('detail-amount');
+            amountElement.textContent = `{{ $activeBusiness->currency }} ${parseFloat(transaction.amount).toFixed(2)}`;
+            amountElement.style.color = transaction.type === 'income' ? 'var(--success-color)' : 'var(--danger-color)';
+
+            // Date
+            document.getElementById('detail-date').textContent = new Date(transaction.transaction_date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Status badge
+            const statusBadge = document.getElementById('detail-status');
+            statusBadge.textContent = transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1);
+            statusBadge.className = `badge ${
+                transaction.status === 'approved' ? 'badge-success' :
+                (transaction.status === 'pending' ? 'badge-warning' : 'badge-danger')
+            }`;
+
+            // Category
+            document.getElementById('detail-category').textContent = transaction.category?.name || '—';
+
+            // Description
+            document.getElementById('detail-description').textContent = transaction.description || 'No description';
+
+            // Receipt section
+            const receiptSection = document.getElementById('receipt-section');
+            if (transaction.image_path) {
+                receiptSection.style.display = 'block';
+                document.getElementById('receipt-link').href = `/transactions/${transaction.id}/receipt`;
+            } else {
+                receiptSection.style.display = 'none';
+            }
+
+            // Activity timeline
+            populateActivityTimeline(activities);
+
+            // Action buttons
+            document.getElementById('edit-transaction-btn').onclick = () => editTransactionFromDetail();
+            document.getElementById('delete-transaction-btn').onclick = () => deleteTransactionFromDetail();
+        }
+
+        // Populate activity timeline
+        function populateActivityTimeline(activities) {
+            const timeline = document.getElementById('activity-timeline');
+            timeline.innerHTML = '';
+
+            if (!activities || activities.length === 0) {
+                timeline.innerHTML = '<p style="color: var(--gray-500); font-style: italic;">No activity recorded</p>';
+                return;
+            }
+
+            activities.forEach(activity => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = `timeline-item ${activity.type}`;
+
+                timelineItem.innerHTML = `
+                    <div class="timeline-content">
+                        <div class="timeline-title">${activity.title}</div>
+                        <div class="timeline-description">${activity.description}</div>
+                        <div class="timeline-meta">
+                            <span>By ${activity.user_name}</span>
+                            <span>${new Date(activity.created_at).toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+
+                timeline.appendChild(timelineItem);
+            });
+        }
+
+        // Open transaction detail modal
+        function openTransactionDetailModal() {
+            const modal = document.getElementById('transaction-detail-modal');
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        // Close transaction detail modal
+        function closeTransactionDetail() {
+            const modal = document.getElementById('transaction-detail-modal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentTransactionId = null;
+            }, 300);
+        }
+
+        // Edit transaction from detail modal
+        function editTransactionFromDetail() {
+            if (currentTransactionId) {
+                closeTransactionDetail();
+                editTransaction(currentTransactionId);
+            }
+        }
+
+        // Delete transaction from detail modal
+        function deleteTransactionFromDetail() {
+            if (currentTransactionId) {
+                closeTransactionDetail();
+                deleteTransaction(currentTransactionId);
+            }
+        }
+
+        // Update summary cards based on filters
+        function updateSummaryCards() {
+            // Get current filter values
+            const filters = {
+                duration: $('select:eq(0)').val(),
+                type: $('select:eq(1)').val(),
+                member: $('select:eq(2)').val(),
+                payment_mode: $('select:eq(3)').val(),
+                category: $('select:eq(4)').val(),
+                search: $('input[placeholder*="Search"]').val()
+            };
+
+            fetch('{{ route("books.summary", $book) }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(filters)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update summary cards with filtered data
+                    updateSummaryCard('.cash-in-card', data.total_income);
+                    updateSummaryCard('.cash-out-card', data.total_expense);
+                    updateSummaryCard('.net-balance-card', data.net_balance);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating summary:', error);
+            });
+        }
+
+        function updateSummaryCard(selector, amount) {
+            const card = document.querySelector(selector);
+            if (card) {
+                const amountElement = card.querySelector('.summary-amount');
+                if (amountElement) {
+                    amountElement.textContent = `{{ $activeBusiness->currency }} ${Math.abs(amount).toLocaleString()}`;
+                }
+            }
+        }
+
+        // Alpine.js integration functions
+        function openCashInModal() {
+            console.log('Opening Cash In modal');
+            const form = document.getElementById('transaction-form');
+            form.reset();
+            document.getElementById('type').value = 'income';
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'add-transaction' }));
+        }
+
+        function openCashOutModal() {
+            console.log('Opening Cash Out modal');
+            const form = document.getElementById('transaction-form');
+            form.reset();
+            document.getElementById('type').value = 'expense';
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'add-transaction' }));
+        }
+
+        function closeAddTransactionModal() {
+            console.log('Closing add transaction modal');
+            window.dispatchEvent(new CustomEvent('close-modal', { detail: 'add-transaction' }));
+        }
+
+        // Alpine.js availability check
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.Alpine) {
+                    console.log('Alpine.js is available');
+                } else {
+                    console.log('Alpine.js is NOT available');
+                }
+            }, 1000);
+        });
+
+        // Add transaction via AJAX
+        document.getElementById('transaction-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = 'Saving...';
+            submitBtn.disabled = true;
+
+            fetch('{{ route("transactions.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal using Alpine.js dispatch
+                    window.dispatchEvent(new CustomEvent('close-modal', {
+                        detail: 'add-transaction'
+                    }));
+
+                    // Reset form
+                    this.reset();
+
+                    // Show success message
+                    showNotification('Transaction added successfully!', 'success');
+
+                    // Reload DataTable to show new transaction
+                    dataTable.ajax.reload();
+
+                    // Update summary cards
+                    updateSummaryCards();
+                } else {
+                    showNotification(data.message || 'Error adding transaction', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error adding transaction', 'error');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Edit, Delete, and other transaction functions
+        function editTransaction(id) {
+            console.log('Attempting to edit transaction:', id);
+
+            fetch(`/transactions/${id}/edit`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const transaction = data.transaction;
+
+                    // Populate edit form
+                    document.getElementById('edit_transaction_id').value = transaction.id;
+                    document.getElementById('edit_type').value = transaction.type;
+                    document.getElementById('edit_amount').value = transaction.amount;
+                    // Format datetime for datetime-local input (YYYY-MM-DDTHH:MM)
+                    const transactionDate = new Date(transaction.transaction_date);
+                    const formattedDate = transactionDate.toISOString().slice(0, 16);
+                    document.getElementById('edit_transaction_date').value = formattedDate;
+                    document.getElementById('edit_category_id').value = transaction.category_id || '';
+                    document.getElementById('edit_description').value = transaction.description || '';
+
+                    // Handle current receipt
+                    const currentReceipt = document.getElementById('current-receipt');
+                    const receiptLink = document.getElementById('receipt-link');
+
+                    if (transaction.image_path) {
+                        receiptLink.href = `/transactions/${transaction.id}/receipt`;
+                        currentReceipt.style.display = 'block';
+                    } else {
+                        currentReceipt.style.display = 'none';
+                    }
+
+                    // Open edit modal
+                    window.dispatchEvent(new CustomEvent('open-modal', {
+                        detail: 'edit-transaction'
+                    }));
+                } else {
+                    showNotification('Error loading transaction data: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching transaction data:', error);
+                showNotification('Error loading transaction data: ' + error.message, 'error');
+            });
+        }
+
+        function deleteTransaction(id) {
+            if (!confirm('Are you sure you want to delete this transaction?')) {
+                return;
+            }
+
+            fetch(`/transactions/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Transaction deleted successfully!', 'success');
+                    dataTable.ajax.reload();
+                    updateSummaryCards();
+                } else {
+                    showNotification(data.message || 'Error deleting transaction', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting transaction', 'error');
+            });
+        }
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                color: white;
+                font-weight: 500;
+                z-index: 9999;
+                max-width: 300px;
+                background-color: ${type === 'success' ? 'var(--success-color)' : 'var(--danger-color)'};
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            `;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+
+
+        // Edit transaction via AJAX
+        document.getElementById('edit-transaction-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const transactionId = document.getElementById('edit_transaction_id').value;
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+
+            // Disable submit button and show loading state
+            submitBtn.textContent = 'Updating...';
+            submitBtn.disabled = true;
+
+            console.log('Editing transaction ID:', transactionId);
+
+            fetch(`/transactions/${transactionId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Close modal using Alpine.js dispatch
+                    window.dispatchEvent(new CustomEvent('close-modal', {
+                        detail: 'edit-transaction'
+                    }));
+
+                    // Show success message
+                    showNotification('Transaction updated successfully!', 'success');
+
+                    // Reload DataTable to show updated transaction
+                    dataTable.ajax.reload();
+
+                    // Update summary cards
+                    updateSummaryCards();
+                } else {
+                    showNotification(data.message || 'Error updating transaction', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error updating transaction: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Edit transaction function
+        function editTransaction(id) {
+            console.log('Attempting to edit transaction:', id);
+
+            fetch(`/transactions/${id}/edit`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Edit fetch response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Edit fetch response data:', data);
+                if (data.success) {
+                    const transaction = data.transaction;
+
+                    // Populate edit form
+                    document.getElementById('edit_transaction_id').value = transaction.id;
+                    document.getElementById('edit_type').value = transaction.type;
+                    document.getElementById('edit_amount').value = transaction.amount;
+                    // Format datetime for datetime-local input (YYYY-MM-DDTHH:MM)
+                    const transactionDate = new Date(transaction.transaction_date);
+                    const formattedDate = transactionDate.toISOString().slice(0, 16);
+                    document.getElementById('edit_transaction_date').value = formattedDate;
+                    document.getElementById('edit_category_id').value = transaction.category_id || '';
+                    document.getElementById('edit_description').value = transaction.description || '';
+
+                    // Handle current receipt
+                    const currentReceipt = document.getElementById('current-receipt');
+                    const receiptLink = document.getElementById('receipt-link');
+
+                    if (transaction.image_path) {
+                        receiptLink.href = `/transactions/${transaction.id}/receipt`;
+                        currentReceipt.style.display = 'block';
+                    } else {
+                        currentReceipt.style.display = 'none';
+                    }
+
+                    // Open edit modal using Alpine.js dispatch
+                    window.dispatchEvent(new CustomEvent('open-modal', {
+                        detail: 'edit-transaction'
+                    }));
+                } else {
+                    showNotification('Error loading transaction data: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching transaction data:', error);
+                showNotification('Error loading transaction data: ' + error.message, 'error');
+            });
+        }
+
+        // Delete transaction function
+        function deleteTransaction(id) {
+            if (!confirm('Are you sure you want to delete this transaction?')) {
+                return;
+            }
+
+            fetch(`/transactions/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Transaction deleted successfully!', 'success');
+                    // Reload DataTable to reflect deletion
+                    dataTable.ajax.reload();
+                    // Update summary cards
+                    updateSummaryCards();
+                } else {
+                    showNotification(data.message || 'Error deleting transaction', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting transaction', 'error');
+            });
+        }
+
+        // Approve transaction function
+        function approveTransaction(id) {
+            fetch(`/transactions/${id}/approve`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Transaction approved successfully!', 'success');
+                    // Reload DataTable to reflect status change
+                    dataTable.ajax.reload();
+                    // Update summary cards
+                    updateSummaryCards();
+                } else {
+                    showNotification(data.message || 'Error approving transaction', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error approving transaction', 'error');
+            });
+        }
+
+        // Reject transaction function
+        function rejectTransaction(id) {
+            fetch(`/transactions/${id}/reject`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Transaction rejected successfully!', 'success');
+                    // Reload DataTable to reflect status change
+                    dataTable.ajax.reload();
+                    // Update summary cards
+                    updateSummaryCards();
+                } else {
+                    showNotification(data.message || 'Error rejecting transaction', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error rejecting transaction', 'error');
+            });
+        }
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                color: white;
+                font-weight: 500;
+                z-index: 9999;
+                max-width: 300px;
+                background-color: ${type === 'success' ? 'var(--success-color)' : 'var(--danger-color)'};
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            `;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // User Management Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for manage users modal open event
+            window.addEventListener('open-modal', function(event) {
+                if (event.detail === 'manage-users') {
+                    loadBookUsers();
+                    initializeUserSearch();
+                }
+            });
+
+            // Add user form submission
+            document.getElementById('add-user-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addUserToBook();
+            });
+        });
+
+        function initializeUserSearch() {
+            const searchInput = document.getElementById('user_search');
+            const resultsDiv = document.getElementById('user_search_results');
+            const selectedUserIdInput = document.getElementById('selected_user_id');
+            const selectedUserDisplay = document.getElementById('selected_user_display');
+            const addBtn = document.getElementById('add-user-btn');
+            let searchTimeout;
+
+            // Clear any previous state
+            clearSelectedUser();
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+
+                clearTimeout(searchTimeout);
+
+                if (query.length < 2) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    searchUsers(query);
+                }, 300);
+            });
+
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+                    resultsDiv.style.display = 'none';
+                }
+            });
+        }
+
+        function searchUsers(query) {
+            const resultsDiv = document.getElementById('user_search_results');
+
+            fetch(`/books/{{ $book->id }}/users/search?q=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displaySearchResults(data.users);
+                } else {
+                    resultsDiv.innerHTML = '<div style="padding: 0.75rem; color: var(--gray-500);">No users found</div>';
+                    resultsDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error searching users:', error);
+                resultsDiv.innerHTML = '<div style="padding: 0.75rem; color: var(--danger-color);">Error searching users</div>';
+                resultsDiv.style.display = 'block';
+            });
+        }
+
+        function displaySearchResults(users) {
+            const resultsDiv = document.getElementById('user_search_results');
+
+            if (users.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding: 0.75rem; color: var(--gray-500);">No users found</div>';
+            } else {
+                resultsDiv.innerHTML = users.map(user => `
+                    <div onclick="selectUser(${user.id}, '${user.display.replace(/'/g, "\\'")}', '${user.name.replace(/'/g, "\\'")}', '${user.email.replace(/'/g, "\\'")}')"
+                         style="
+                             padding: 0.75rem;
+                             cursor: pointer;
+                             border-bottom: 1px solid var(--gray-100);
+                             transition: background-color 0.2s;
+                         "
+                         onmouseover="this.style.backgroundColor='var(--gray-50)'"
+                         onmouseout="this.style.backgroundColor='white'">
+                        <div style="font-weight: 600; color: var(--gray-900);">${user.name}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">${user.email}</div>
+                        ${!user.is_business_member ?
+                            '<div style="font-size: 0.75rem; color: var(--warning-color); font-weight: 500;">⚠ Will be added to business</div>' :
+                            ''
+                        }
+                    </div>
+                `).join('');
+            }
+
+            resultsDiv.style.display = 'block';
+        }
+
+        function selectUser(userId, display, name, email) {
+            const searchInput = document.getElementById('user_search');
+            const resultsDiv = document.getElementById('user_search_results');
+            const selectedUserIdInput = document.getElementById('selected_user_id');
+            const selectedUserDisplay = document.getElementById('selected_user_display');
+            const selectedUserText = document.getElementById('selected_user_text');
+            const addBtn = document.getElementById('add-user-btn');
+
+            // Set the selected user
+            selectedUserIdInput.value = userId;
+            selectedUserText.textContent = display;
+
+            // Hide search input and show selected user display
+            searchInput.style.display = 'none';
+            resultsDiv.style.display = 'none';
+            selectedUserDisplay.style.display = 'block';
+
+            // Enable the add button
+            addBtn.disabled = false;
+        }
+
+        function clearSelectedUser() {
+            const searchInput = document.getElementById('user_search');
+            const resultsDiv = document.getElementById('user_search_results');
+            const selectedUserIdInput = document.getElementById('selected_user_id');
+            const selectedUserDisplay = document.getElementById('selected_user_display');
+            const addBtn = document.getElementById('add-user-btn');
+
+            // Clear all fields
+            searchInput.value = '';
+            searchInput.style.display = 'block';
+            selectedUserIdInput.value = '';
+            resultsDiv.style.display = 'none';
+            selectedUserDisplay.style.display = 'none';
+            addBtn.disabled = true;
+        }
+
+        function loadBookUsers() {
+            fetch(`/books/{{ $book->id }}/users`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayBookUsers(data.bookUsers);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading book users:', error);
+                showNotification('Error loading users', 'error');
+            });
+        }
+
+        function populateAvailableUsers(users) {
+            // This function is no longer needed with searchable input
+        }
+
+        function displayBookUsers(users) {
+            const container = document.getElementById('users-list');
+            container.innerHTML = '';
+
+            if (users.length === 0) {
+                container.innerHTML = '<p style="color: var(--gray-500); text-align: center; padding: 1rem;">No users assigned to this book yet.</p>';
+                return;
+            }
+
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius); margin-bottom: 0.5rem;';
+
+                userElement.innerHTML = `
+                    <div>
+                        <div style="font-weight: 600; color: var(--gray-900);">${user.name}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">${user.email}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-400);">Added on ${user.assigned_at}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <select onchange="updateUserRole(${user.id}, this.value)" style="font-size: 0.875rem; padding: 0.25rem 0.5rem; border: 1px solid var(--gray-300); border-radius: 0.25rem;">
+                            <option value="viewer" ${user.role === 'viewer' ? 'selected' : ''}>Viewer</option>
+                            <option value="editor" ${user.role === 'editor' ? 'selected' : ''}>Editor</option>
+                            <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+                        </select>
+                        <button onclick="removeUserFromBook(${user.id})" style="background: none; border: none; color: var(--danger-color); cursor: pointer; padding: 0.25rem;">
+                            <svg style="width: 1rem; height: 1rem;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(userElement);
+            });
+        }
+
+        function addUserToBook() {
+            const form = document.getElementById('add-user-form');
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+
+            // Check if user is selected
+            if (!document.getElementById('selected_user_id').value) {
+                showNotification('Please select a user first', 'error');
+                return;
+            }
+
+            submitBtn.textContent = 'Adding...';
+            submitBtn.disabled = true;
+
+            fetch(`/books/{{ $book->id }}/users/invite`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('User added successfully!', 'success');
+                    clearSelectedUser(); // Clear the selected user
+                    document.getElementById('user_role').value = 'viewer'; // Reset role to default
+                    loadBookUsers(); // Reload the users list
+                } else {
+                    showNotification(data.message || 'Error adding user', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding user:', error);
+                showNotification('Error adding user', 'error');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+
+        function updateUserRole(userId, newRole) {
+            fetch(`/books/{{ $book->id }}/users/${userId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ role: newRole })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('User role updated successfully!', 'success');
+                } else {
+                    showNotification(data.message || 'Error updating role', 'error');
+                    loadBookUsers(); // Reload to reset the select
+                }
+            })
+            .catch(error => {
+                console.error('Error updating role:', error);
+                showNotification('Error updating role', 'error');
+                loadBookUsers(); // Reload to reset the select
+            });
+        }
+
+        function removeUserFromBook(userId) {
+            if (!confirm('Are you sure you want to remove this user from the book?')) {
+                return;
+            }
+
+            fetch(`/books/{{ $book->id }}/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('User removed successfully!', 'success');
+                    loadBookUsers(); // Reload the users list
+                } else {
+                    showNotification(data.message || 'Error removing user', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing user:', error);
+                showNotification('Error removing user', 'error');
+            });
+        }
+    </script>
+</x-app-layout>
