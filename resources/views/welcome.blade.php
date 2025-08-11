@@ -1,208 +1,135 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'CashBook') }} - 100% Free Cash Management</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CashBook is a free, secure cash management app to track your finances easily. No subscriptions or hidden fees." />
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <title>{{ config('app.name', 'CashBook') }} - Free Cash Management</title>
+</head>
+<body style="margin:0; font-family: Inter, Arial, sans-serif; background-color:#f9fafb; color:#1f2937;">
 
-        <!-- Custom CSS -->
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- Navbar -->
+    <header style="background:white; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+        <div style="max-width:1200px; margin:0 auto; padding:0 16px; height:64px; display:flex; align-items:center; justify-content:space-between;">
+            <h1 style="font-size:20px; font-weight:700; color:#16a34a;">
+                <img src="{{ Storage::url('images/logo.svg') }}" alt="CashBook Logo" style="height: 32px; width: auto; vertical-align: middle;">
+                CashBook
+            </h1>
+            <nav style="display:flex; gap:16px; align-items:center;">
+                @auth
+                    <a href="{{ route('dashboard') }}" style="color:#374151; text-decoration:none;">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" style="color:#374151; text-decoration:none;">Login</a>
+                    <a href="{{ route('register') }}" style="padding:8px 16px; background:#16a34a; color:white; border-radius:8px; text-decoration:none;">Get Started</a>
+                @endauth
+            </nav>
+        </div>
+    </header>
 
-        <!-- Alpine.js -->
-        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    </head>
-    <body>
-        <!-- Navigation -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="flex items-center">
-                    <h1 class="app-logo">CashBook</h1>
-                </div>
-                <nav class="nav-menu">
-                    @auth
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link">Dashboard</a>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a href="{{ route('login') }}" class="nav-link">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('register') }}" class="btn btn-primary">Get Started</a>
-                        </li>
-                    @endauth
-                </nav>
+    <!-- Hero -->
+    <section style="background:linear-gradient(to bottom right,#f0fdf4,white); padding:64px 16px; text-align:center;">
+        <div style="max-width:700px; margin:0 auto;">
+            <h2 style="font-size:36px; font-weight:800; color:#111827; margin:0;">Simple, Powerful Cash Management</h2>
+            <p style="margin-top:16px; font-size:18px; color:#4b5563;">
+                Track your cash flow with ease. No subscriptions, no hidden fees —
+                <span style="color:#16a34a; font-weight:600;">100% free</span> forever.
+            </p>
+            <div style="margin-top:32px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+                @auth
+                    <a href="{{ route('dashboard') }}" style="padding:12px 24px; background:#16a34a; color:white; border-radius:8px; text-decoration:none;">Go to Dashboard</a>
+                @else
+                    <a href="{{ route('register') }}" style="padding:12px 24px; background:#16a34a; color:white; border-radius:8px; text-decoration:none;">Create Free Account</a>
+                    <a href="{{ route('login') }}" style="padding:12px 24px; border:1px solid #d1d5db; border-radius:8px; text-decoration:none; color:#374151; background:white;">Sign In</a>
+                @endauth
             </div>
-        </header>
+        </div>
+    </section>
 
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div style="max-width: 1200px; margin: 0 auto;">
-                <h1 class="hero-title">Professional Cash Management. 100% Free.</h1>
-                <p class="hero-subtitle">
-                    CashBook is <span style="color: #22c55e; font-weight: 600;">completely free</span> for everyone. No subscriptions, no credit card required, no hidden fees.<br>
-                    Streamline your business finances with powerful cash flow tracking, multi-business support, and comprehensive reporting tools.
-                </p>
-                <div style="margin-top: 2rem;">
-                    @auth
-                        <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-lg">Go to Dashboard</a>
-                    @else
-                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                            <a href="{{ route('register') }}" class="btn btn-secondary btn-lg">Create Free Account</a>
-                            <a href="{{ route('login') }}" class="btn btn-primary btn-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);">Sign In</a>
-                        </div>
-                    @endauth
-                </div>
+    <!-- Features -->
+    <section style="padding:64px 16px;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <h3 style="text-align:center; font-size:24px; font-weight:700; margin-bottom:48px;">Everything You Need to Manage Your Cash Flow</h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:24px;">
+                @foreach([
+                    ['📚', 'Multiple Cash Books', 'Organize finances for different projects or departments easily.'],
+                    ['🏢', 'Multi-Business Support', 'Switch between businesses seamlessly from one account.'],
+                    ['📊', 'Advanced Analytics', 'Get insights with real-time charts & reports.'],
+                    ['🔒', 'Secure & Reliable', 'Enterprise-grade security and daily backups.'],
+                    ['💳', 'Transaction Management', 'Categorize income & expenses with receipt uploads.'],
+                    ['⚡', 'Lightning Fast', 'Quick data entry & instant search.'],
+                    ['💻', 'Open Source Tech', 'Built with Laravel, Vue.js, Bootstrap, and MySQL.']
+                ] as [$icon, $title, $desc])
+                    <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                        <div style="font-size:28px; margin-bottom:16px;">{{ $icon }}</div>
+                        <h4 style="font-size:18px; font-weight:600; margin-bottom:8px;">{{ $title }}</h4>
+                        <p style="color:#4b5563; font-size:15px;">{{ $desc }}</p>
+                    </div>
+                @endforeach
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Features Section -->
-        <section style="padding: 4rem 0;">
-            <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
-                <div class="text-center mb-8">
-                    <h2 class="page-title">Everything you need to manage your cash flow</h2>
-                    <p class="page-subtitle">Powerful features designed for modern businesses</p>
-                </div>
+    <!-- CTA -->
+    <section style="padding:64px 16px; text-align:center; background:#f3f4f6;">
+        <h3 style="font-size:24px; font-weight:700; margin-bottom:16px;">
+            Join the CashBook Community — 100% Free & Open Source
+        </h3>
+        <p style="color:#4b5563; font-size:16px; margin-bottom:32px;">
+            Track your cash flow with a secure, user-friendly app trusted by thousands.
+            <span style="color:#16a34a; font-weight:600;">No subscriptions, no hidden fees.</span>
+        </p>
+        @guest
+            <a href="{{ route('register') }}" style="padding:12px 24px; background:#16a34a; color:white; border-radius:8px; text-decoration:none; margin-right:16px;">Create Free Account</a>
+        @endguest
+        <a href="https://github.com/Riaz-Mahmud/cashbook" target="_blank" rel="noopener noreferrer" style="padding:12px 24px; border:2px solid #16a34a; border-radius:8px; text-decoration:none; color:#16a34a; font-weight:600;">
+            View on GitHub
+        </a>
+    </section>
 
-                <div class="feature-grid">
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Multiple Cash Books</h3>
-                        <p class="feature-description">
-                            Organize your finances with unlimited cash books. Track different projects,
-                            departments, or business units separately with ease.
-                        </p>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-6 4h3"></path>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Multi-Business Support</h3>
-                        <p class="feature-description">
-                            Manage multiple businesses from one account. Switch between businesses
-                            seamlessly and keep all your financial data organized.
-                        </p>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Advanced Analytics</h3>
-                        <p class="feature-description">
-                            Get insights into your cash flow with detailed reports, charts, and analytics.
-                            Make informed decisions with real-time financial data.
-                        </p>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Secure & Reliable</h3>
-                        <p class="feature-description">
-                            Your financial data is protected with enterprise-grade security.
-                            Regular backups and secure hosting ensure your data is always safe.
-                        </p>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Transaction Management</h3>
-                        <p class="feature-description">
-                            Record income and expenses with detailed categorization.
-                            Upload receipts, add notes, and track every transaction efficiently.
-                        </p>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Lightning Fast</h3>
-                        <p class="feature-description">
-                            Built for speed and efficiency. Quick data entry, instant search,
-                            and responsive design make managing finances a breeze.
-                        </p>
-                    </div>
-                </div>
+    <!-- Stats -->
+    <section style="background:#f3f4f6; padding:64px 16px;">
+        <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:24px; text-align:center;">
+            <div>
+                <div style="font-size:28px; font-weight:700; color:#16a34a;">10,000+</div>
+                <p style="color:#4b5563;">Active Users</p>
             </div>
-        </section>
-
-        <!-- Stats Section -->
-        <section style="background: var(--gray-100); padding: 4rem 0;">
-            <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
-                <div class="text-center mb-8">
-                    <h2 class="page-title">Trusted by businesses worldwide</h2>
-                    <p class="page-subtitle">Join thousands of businesses managing their cash flow with CashBook</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card text-center">
-                        <div class="stat-value">10,000+</div>
-                        <div class="stat-label">Active Users</div>
-                    </div>
-                    <div class="stat-card text-center">
-                        <div class="stat-value">$50M+</div>
-                        <div class="stat-label">Tracked Revenue</div>
-                    </div>
-                    <div class="stat-card text-center">
-                        <div class="stat-value">99.9%</div>
-                        <div class="stat-label">Uptime</div>
-                    </div>
-                    <div class="stat-card text-center">
-                        <div class="stat-value">24/7</div>
-                        <div class="stat-label">Support</div>
-                    </div>
-                </div>
+            <div>
+                <div style="font-size:28px; font-weight:700; color:#16a34a;">$50M+</div>
+                <p style="color:#4b5563;">Tracked Revenue</p>
             </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="hero-section" style="padding: 3rem 2rem;">
-            <div style="max-width: 800px; margin: 0 auto;">
-                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">Ready to take control of your cash flow?</h2>
-                <p style="font-size: 1.125rem; margin-bottom: 2rem; opacity: 0.9;">
-                    CashBook is <span style="color: #22c55e; font-weight: 600;">100% free</span> for everyone. No subscriptions, no credit card required, no limits.
-                </p>
-                @guest
-                    <a href="{{ route('register') }}" class="btn btn-secondary btn-lg">Create Your Free Account</a>
-                @endguest
+            <div>
+                <div style="font-size:28px; font-weight:700; color:#16a34a;">99.9%</div>
+                <p style="color:#4b5563;">Uptime</p>
             </div>
-        </section>
-
-        <!-- Footer -->
-        <footer style="background: var(--gray-800); color: white; padding: 2rem;">
-            <div style="max-width: 1200px; margin: 0 auto; text-center;">
-                <p style="margin-bottom: 1rem;">&copy; {{ date('Y') }} CashBook. All rights reserved.</p>
-                <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
-                    <a href="{{ route('privacy') }}" style="color: var(--gray-400); text-decoration: none;">Privacy Policy</a>
-                    <a href="#" style="color: var(--gray-400); text-decoration: none;">Terms of Service</a>
-                    <a href="#" style="color: var(--gray-400); text-decoration: none;">Support</a>
-                    <a href="#" style="color: var(--gray-400); text-decoration: none;">Contact</a>
-                </div>
+            <div>
+                <div style="font-size:28px; font-weight:700; color:#16a34a;">24/7</div>
+                <p style="color:#4b5563;">Support</p>
             </div>
-        </footer>
-    </body>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="padding:64px 16px; text-align:center;">
+        <h3 style="font-size:24px; font-weight:700; margin-bottom:16px;">Ready to Take Control of Your Cash Flow?</h3>
+        <p style="color:#4b5563; font-size:16px; margin-bottom:32px;">
+            Sign up now and start managing your finances smarter — <span style="color:#16a34a; font-weight:600;">100% free</span>.
+        </p>
+        @guest
+            <a href="{{ route('register') }}" style="padding:12px 24px; background:#16a34a; color:white; border-radius:8px; text-decoration:none;">Create Free Account</a>
+        @endguest
+    </section>
+
+    <!-- Footer -->
+    <footer style="background:#1f2937; color:#9ca3af; padding:32px 16px; text-align:center;">
+        <p style="margin-bottom:16px;">&copy; {{ date('Y') }} CashBook. All rights reserved.</p>
+        <div style="display:flex; gap:24px; justify-content:center; flex-wrap:wrap; font-size:14px;">
+            <a href="{{ route('privacy') }}" style="color:#9ca3af; text-decoration:none;">Privacy Policy</a>
+            <a href="#" style="color:#9ca3af; text-decoration:none;">Terms</a>
+            <a href="#" style="color:#9ca3af; text-decoration:none;">Support</a>
+            <a href="#" style="color:#9ca3af; text-decoration:none;">Contact</a>
+        </div>
+    </footer>
+
+</body>
 </html>
