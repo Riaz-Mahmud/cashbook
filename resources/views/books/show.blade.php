@@ -1,9 +1,53 @@
 <x-app-layout>
-    <div style="margin-bottom: 2rem;">
-        <h1 style="font-size: 2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">{{ $book->name }}</h1>
-        @if($book->description)
-            <p style="color: var(--gray-600); margin-top: 0.5rem;">{{ $book->description }}</p>
-        @endif
+    <!-- Redesigned Page Header -->
+    <div class="page-header-redesigned">
+
+        <!-- Left side: Back Arrow, Title, and Icons -->
+        <div class="page-header-left">
+            <a href="{{ route('books.index') }}" class="page-header-back-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </a>
+            <div class="page-header-title-group">
+                <h1 class="page-title">{{ $book->name }}</h1>
+                <a href="{{ route('books.edit', $book) }}" class="page-header-icon-btn" title="Edit Book Settings">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </a>
+                <button @click="$dispatch('open-modal', 'manage-users')" class="page-header-icon-btn" title="Manage Users">
+                    <svg height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        viewBox="0 0 60.671 60.671" xml:space="preserve">
+                    <g>
+                        <g>
+                            <ellipse style="fill:#010002;" cx="30.336" cy="12.097" rx="11.997" ry="12.097"/>
+                            <path style="fill:#010002;" d="M35.64,30.079H25.031c-7.021,0-12.714,5.739-12.714,12.821v17.771h36.037V42.9
+                                C48.354,35.818,42.661,30.079,35.64,30.079z"/>
+                        </g>
+                    </g>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right side: Action Buttons -->
+        <div class="page-header-right">
+            <a href="{{ route('transactions.import.create', $book) }}" class="btn btn-secondary">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Bulk Entries
+            </a>
+            <a href="{{ route('reports.index', $book) }}" class="btn btn-secondary">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Reports
+            </a>
+        </div>
+
     </div>
 
     <!-- Filters and Summary Section -->
@@ -49,12 +93,9 @@
                     <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Payment Modes</label>
                     <select class="form-select" style="font-size: 0.875rem;">
                         <option value="">All</option>
-                        <option value="cash">Cash</option>
-                        <option value="card">Card</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="check">Check</option>
-                        <option value="digital_wallet">Digital Wallet</option>
-                        <option value="other">Other</option>
+                        @foreach($modes as $mode)
+                            <option value="{{ $mode }}">{{ ucfirst($mode) }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -77,54 +118,54 @@
             <!-- Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                 <!-- Cash In Summary -->
-                <div style="background: linear-gradient(135deg, var(--success-color), #10b981); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                <div class="cash-in-card" style="background: linear-gradient(135deg, var(--success-color), #10b981); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
                     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
                         <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                         </svg>
                         <span style="font-weight: 600;">Cash In</span>
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;" id="summary-amount">
                         @php
                             // Get totals from all transactions, not just paginated ones
                             $allTransactions = $book->transactions;
                             $totalIncome = $allTransactions->where('type', 'income')->sum('amount');
                         @endphp
-                        {{ $activeBusiness->currency }} {{ number_format($totalIncome, 0) }}
+                        {{ $book->currency }} {{ number_format($totalIncome, 0) }}
                     </div>
                     {{-- <div style="font-size: 0.75rem; opacity: 0.9;">Total Income</div> --}}
                 </div>
 
                 <!-- Cash Out Summary -->
-                <div style="background: linear-gradient(135deg, var(--danger-color), #ef4444); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                <div class="cash-out-card" style="background: linear-gradient(135deg, var(--danger-color), #ef4444); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
                     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
                         <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                         </svg>
                         <span style="font-weight: 600;">Cash Out</span>
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;" class="summary-amount">
                         @php
                             $totalExpense = $allTransactions->where('type', 'expense')->sum('amount');
                         @endphp
-                        {{ $activeBusiness->currency }} {{ number_format($totalExpense, 0) }}
+                        {{ $book->currency }} {{ number_format($totalExpense, 0) }}
                     </div>
                     {{-- <div style="font-size: 0.75rem; opacity: 0.9;">Total Expense</div> --}}
                 </div>
 
                 <!-- Net Balance Summary -->
-                <div style="background: linear-gradient(135deg, var(--primary-color), #3b82f6); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                <div class="net-balance-card" style="background: linear-gradient(135deg, var(--primary-color), #3b82f6); color: white; padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
                     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
                         <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                         </svg>
                         <span style="font-weight: 600;">Net Balance</span>
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;" class="summary-amount">
                         @php
                             $netBalance = ($totalIncome ?? 0) - ($totalExpense ?? 0);
                         @endphp
-                        {{ $activeBusiness->currency }} {{ $netBalance >= 0 ? '' : '-' }}{{ number_format(abs($netBalance), 0) }}
+                        {{ $book->currency }} {{ $netBalance >= 0 ? '' : '-' }}{{ number_format(abs($netBalance), 0) }}
                     </div>
                     {{-- <div style="font-size: 0.75rem; opacity: 0.9;">{{ $netBalance >= 0 ? 'Profit' : 'Loss' }}</div> --}}
                 </div>
@@ -133,8 +174,8 @@
     </div>
 
     <!-- Action Bar -->
-    <div x-data="{}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div style="display: flex; gap: 1rem;">
+    <div x-data="{}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
             @if($bookRole !== 'viewer')
             <button @click="$dispatch('open-modal', 'add-transaction'); $nextTick(() => { document.getElementById('type').value = 'income'; document.getElementById('transaction-form').reset(); document.getElementById('type').value = 'income'; })" class="btn btn-success">
                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,22 +201,31 @@
                 Manage Users
             </button>
             @endif
+            @if($bookRole !== 'viewer')
+                <!-- New Bulk Delete Button -->
+                <button id="bulk-delete-btn" class="btn btn-danger" style="display: none;" onclick="bulkDeleteTransactions()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Delete Selected (<span id="selected-count">0</span>)
+                </button>
+            @endif
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
             <span style="font-size: 0.875rem; color: var(--gray-500);">{{ $transactions->total() }} total transactions</span>
         </div>
     </div>
 
-    <!-- Transactions DataTable -->
+    <!-- Transactions Table -->
     <div class="card">
-        <div class="card-body" style="padding: 0;">
+        <div class="card-body" style="padding: 0; overflow-x: auto; max-height: 70vh; overflow-y: auto;">
             <table id="transactions-table" class="table" style="width: 100%;">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select-all-checkbox"></th>
                         <th>Date</th>
                         <th>Description</th>
                         <th>Category</th>
+                        <th>Mode</th>
                         <th>Type</th>
                         <th style="text-align: right;">Amount</th>
                         <th>Status</th>
@@ -189,6 +239,7 @@
             </table>
         </div>
     </div>
+
 
     <!-- Right Side Transaction Detail Modal -->
     <div id="transaction-detail-modal" class="transaction-detail-modal" style="display: none;">
@@ -282,7 +333,7 @@
                 <input type="hidden" id="transaction_id" name="transaction_id" value="">
                 <input type="hidden" id="form_method" name="_method" value="POST">
 
-                <div class="form-grid">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     <div class="form-group">
                         <label for="type" class="form-label">Type</label>
                         <select id="type" name="type" class="form-select" required>
@@ -294,18 +345,24 @@
 
                     <div class="form-group">
                         <label for="amount" class="form-label">Amount</label>
-                        <input id="amount" name="amount" type="number" step="0.01" min="0.01" class="form-input" required />
+                        <input id="amount" name="amount" type="number" step="0.01" min="0.01" class="form-input" placeholder="Enter amount..." required />
                         <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                     </div>
                 </div>
-
-                <div class="form-grid">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     <div class="form-group">
                         <label for="transaction_date" class="form-label">Date & Time</label>
                         <input id="transaction_date" name="transaction_date" type="datetime-local" class="form-input" value="{{ now()->format('Y-m-d\TH:i') }}" required />
                         <x-input-error :messages="$errors->get('transaction_date')" class="mt-2" />
                     </div>
 
+                    <div class="form-group">
+                        <label for="mode" class="form-label">Payment Mode</label>
+                        <input id="mode" name="mode" type="text" class="form-input" placeholder="Enter payment mode..." required />
+                        <x-input-error :messages="$errors->get('mode')" class="mt-2" />
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     <div class="form-group">
                         <label for="category_id" class="form-label">Category</label>
                         <select id="category_id" name="category_id" class="form-select">
@@ -315,6 +372,12 @@
                             @endforeach
                         </select>
                         <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_category" class="form-label">Or Add New Category</label>
+                        <input id="new_category" name="new_category" type="text" class="form-input" placeholder="Enter new category name..." />
+                        <x-input-error :messages="$errors->get('new_category')" class="mt-2" />
                     </div>
                 </div>
 
@@ -352,7 +415,7 @@
                 <input type="hidden" name="book_id" value="{{ $book->id }}">
                 <input type="hidden" id="edit_transaction_id" name="transaction_id" value="">
 
-                <div class="form-grid">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     <div class="form-group">
                         <label for="edit_type" class="form-label">Type</label>
                         <select id="edit_type" name="type" class="form-select" required>
@@ -367,12 +430,19 @@
                     </div>
                 </div>
 
-                <div class="form-grid">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     <div class="form-group">
                         <label for="edit_transaction_date" class="form-label">Date & Time</label>
                         <input id="edit_transaction_date" name="transaction_date" type="datetime-local" class="form-input" required />
                     </div>
 
+                    <div class="form-group">
+                        <label for="edit_mode" class="form-label">Payment Mode</label>
+                        <input id="edit_mode" name="mode" type="text" class="form-input" required />
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     <div class="form-group">
                         <label for="edit_category_id" class="form-label">Category</label>
                         <select id="edit_category_id" name="category_id" class="form-select">
@@ -381,6 +451,11 @@
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_new_category" class="form-label">Or Add New Category</label>
+                        <input id="edit_new_category" name="new_category" type="text" class="form-input" placeholder="Enter new category name..." />
                     </div>
                 </div>
 
@@ -513,15 +588,22 @@
                         d.duration = $('select:eq(0)').val();
                         d.type = $('select:eq(1)').val();
                         d.member = $('select:eq(2)').val();
-                        d.payment_mode = $('select:eq(3)').val();
+                        d.mode = $('select:eq(3)').val();
                         d.category = $('select:eq(4)').val();
                         d.search = $('input[placeholder*="Search"]').val();
                     }
                 },
                 columns: [
+                    {
+                        data: 'id', name: 'id', orderable: false, searchable: false,
+                        render: function (data, type, row) {
+                            return '<input type="checkbox" class="transaction-checkbox" value="' + data + '">';
+                        }
+                    },
                     { data: 'transaction_date', name: 'transaction_date' },
                     { data: 'description', name: 'description' },
                     { data: 'category', name: 'category.name' },
+                    { data: 'mode', name: 'mode' },
                     { data: 'type', name: 'type' },
                     { data: 'amount', name: 'amount', className: 'text-right' },
                     { data: 'status', name: 'status' },
@@ -530,7 +612,9 @@
                 ],
                 order: [[0, 'desc']],
                 pageLength: 25,
-                responsive: true,
+                responsive: false,
+                lengthMenu: [25, 50, 100],
+                autoWidth: true,
                 language: {
                     processing: 'Loading transactions...',
                     emptyTable: 'No transactions found',
@@ -550,6 +634,29 @@
                 }
             });
 
+            // Handle "Select All" checkbox
+            $('#select-all-checkbox').on('click', function() {
+                const rows = dataTable.rows({ 'search': 'applied' }).nodes();
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+                updateSelectedCount();
+            });
+
+            // Handle individual row checkbox clicks
+            $('#transactions-table tbody').on('change', 'input[type="checkbox"]', function() {
+                if (!this.checked) {
+                    const selectAll = $('#select-all-checkbox').get(0);
+                    if (selectAll && selectAll.checked && ('indeterminate' in selectAll)) {
+                        selectAll.indeterminate = true;
+                    }
+                }
+                updateSelectedCount();
+            });
+
+            // Update checkboxes on table draw
+            dataTable.on('draw', function() {
+                updateSelectedCount();
+            });
+
             // Filter event listeners
             const filterSelects = document.querySelectorAll('.card-body select');
             const searchInput = document.querySelector('input[placeholder*="Search"]');
@@ -566,7 +673,94 @@
                     dataTable.ajax.reload();
                 }, 300));
             }
+
+            document.getElementById('new_category').addEventListener('input', function() {
+                const categorySelect = document.getElementById('category_id');
+                if (this.value.trim() !== '') {
+                    categorySelect.disabled = true;
+                } else {
+                    categorySelect.disabled = false;
+                }
+            });
+
+            document.getElementById('category_id').addEventListener('change', function() {
+                const newCategoryInput = document.getElementById('new_category');
+                if (this.value !== '') {
+                    newCategoryInput.disabled = true;
+                    newCategoryInput.value = '';
+                } else {
+                    newCategoryInput.disabled = false;
+                }
+            });
+
+            document.getElementById('edit_new_category').addEventListener('input', function() {
+                const editCategorySelect = document.getElementById('edit_category_id');
+                if (this.value.trim() !== '') {
+                    editCategorySelect.disabled = true;
+                } else {
+                    editCategorySelect.disabled = false;
+                }
+            });
+
+            document.getElementById('edit_category_id').addEventListener('change', function() {
+                const editNewCategoryInput = document.getElementById('edit_new_category');
+                if (this.value !== '') {
+                    editNewCategoryInput.disabled = true;
+                    editNewCategoryInput.value = '';
+                } else {
+                    editNewCategoryInput.disabled = false;
+                }
+            });
         });
+
+        function updateSelectedCount() {
+            const selectedCount = $('#transactions-table tbody input[type="checkbox"]:checked').length;
+            $('#selected-count').text(selectedCount);
+
+            if (selectedCount > 0) {
+                $('#bulk-delete-btn').show();
+            } else {
+                $('#bulk-delete-btn').hide();
+            }
+        }
+
+        function bulkDeleteTransactions() {
+            const selectedIds = [];
+            $('#transactions-table tbody input[type="checkbox"]:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length === 0) {
+                showNotification('Please select at least one transaction to delete.', 'error');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete ${selectedIds.length} selected transactions? This action cannot be undone.`)) {
+                fetch('{{ route("transactions.bulk-delete") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ ids: selectedIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        dataTable.ajax.reload();
+                        updateSummaryCards();
+                    } else {
+                        showNotification(data.message || 'An error occurred.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while deleting transactions.', 'error');
+                });
+            }
+        }
 
         // Debounce function
         function debounce(func, wait) {
@@ -584,7 +778,6 @@
         // Show transaction detail in right modal
         function showTransactionDetail(id) {
             currentTransactionId = id;
-            console.log('Showing transaction detail for ID:', id);
 
             fetch(`/transactions/${id}/detail`, {
                 method: 'GET',
@@ -625,7 +818,7 @@
 
             // Amount
             const amountElement = document.getElementById('detail-amount');
-            amountElement.textContent = `{{ $activeBusiness->currency }} ${parseFloat(transaction.amount).toFixed(2)}`;
+            amountElement.textContent = `{{ $book->currency }} ${parseFloat(transaction.amount).toFixed(2)}`;
             amountElement.style.color = transaction.type === 'income' ? 'var(--success-color)' : 'var(--danger-color)';
 
             // Date
@@ -737,7 +930,7 @@
                 duration: $('select:eq(0)').val(),
                 type: $('select:eq(1)').val(),
                 member: $('select:eq(2)').val(),
-                payment_mode: $('select:eq(3)').val(),
+                mode: $('select:eq(3)').val(),
                 category: $('select:eq(4)').val(),
                 search: $('input[placeholder*="Search"]').val()
             };
@@ -770,14 +963,13 @@
             if (card) {
                 const amountElement = card.querySelector('.summary-amount');
                 if (amountElement) {
-                    amountElement.textContent = `{{ $activeBusiness->currency }} ${Math.abs(amount).toLocaleString()}`;
+                    amountElement.textContent = `{{ $book->currency }} ${parseFloat(amount).toFixed(2)}`;
                 }
             }
         }
 
         // Alpine.js integration functions
         function openCashInModal() {
-            console.log('Opening Cash In modal');
             const form = document.getElementById('transaction-form');
             form.reset();
             document.getElementById('type').value = 'income';
@@ -785,7 +977,6 @@
         }
 
         function openCashOutModal() {
-            console.log('Opening Cash Out modal');
             const form = document.getElementById('transaction-form');
             form.reset();
             document.getElementById('type').value = 'expense';
@@ -793,7 +984,6 @@
         }
 
         function closeAddTransactionModal() {
-            console.log('Closing add transaction modal');
             window.dispatchEvent(new CustomEvent('close-modal', { detail: 'add-transaction' }));
         }
 
@@ -862,7 +1052,6 @@
 
         // Edit, Delete, and other transaction functions
         function editTransaction(id) {
-            console.log('Attempting to edit transaction:', id);
 
             fetch(`/transactions/${id}/edit`, {
                 method: 'GET',
@@ -891,6 +1080,8 @@
                     document.getElementById('edit_transaction_date').value = formattedDate;
                     document.getElementById('edit_category_id').value = transaction.category_id || '';
                     document.getElementById('edit_description').value = transaction.description || '';
+                    document.getElementById('edit_mode').value = transaction.mode || '';
+                    document.getElementById('edit_new_category').value = '';
 
                     // Handle current receipt
                     const currentReceipt = document.getElementById('current-receipt');
@@ -987,8 +1178,6 @@
             submitBtn.textContent = 'Updating...';
             submitBtn.disabled = true;
 
-            console.log('Editing transaction ID:', transactionId);
-
             fetch(`/transactions/${transactionId}`, {
                 method: 'POST',
                 headers: {
@@ -998,14 +1187,12 @@
                 body: formData
             })
             .then(response => {
-                console.log('Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Response data:', data);
                 if (data.success) {
                     // Close modal using Alpine.js dispatch
                     window.dispatchEvent(new CustomEvent('close-modal', {
@@ -1037,7 +1224,6 @@
 
         // Edit transaction function
         function editTransaction(id) {
-            console.log('Attempting to edit transaction:', id);
 
             fetch(`/transactions/${id}/edit`, {
                 method: 'GET',
@@ -1047,14 +1233,12 @@
                 }
             })
             .then(response => {
-                console.log('Edit fetch response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Edit fetch response data:', data);
                 if (data.success) {
                     const transaction = data.transaction;
 
@@ -1068,6 +1252,7 @@
                     document.getElementById('edit_transaction_date').value = formattedDate;
                     document.getElementById('edit_category_id').value = transaction.category_id || '';
                     document.getElementById('edit_description').value = transaction.description || '';
+                    document.getElementById('edit_mode').value = transaction.mode || '';
 
                     // Handle current receipt
                     const currentReceipt = document.getElementById('current-receipt');

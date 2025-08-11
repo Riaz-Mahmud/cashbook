@@ -17,6 +17,7 @@ class Transaction extends Model
         'user_id',
         'amount',
         'type',
+        'mode',
         'status',
         'approved_by',
         'description',

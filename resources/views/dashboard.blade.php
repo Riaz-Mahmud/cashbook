@@ -31,244 +31,163 @@
                 </div>
             </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card success">
-                <div class="flex items-center mb-3">
-                    <div style="width: 32px; height: 32px; background: #dcfce7; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                        <svg style="width: 20px; height: 20px; color: var(--success-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                        </svg>
+            <div style="padding: 20px; font-family: Arial, sans-serif;">
+                {{-- Search & Sort --}}
+                <div class="search-sort-container">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input id="bookSearchInput" type="text" placeholder="Search by book name...">
+                        <select id="bookSortSelect">
+                            <option value="updated_desc">Sort By : Last Updated</option>
+                            <option value="name_asc">Sort By : Name (A-Z)</option>
+                            <option value="net_high_low">Sort By : Net Balance (High to Low)</option>
+                            <option value="net_low_high">Sort By : Net Balance (Low to High)</option>
+                            <option value="created_desc">Sort By : Last Created</option>
+                        </select>
                     </div>
-                    <div>
-                        <div class="stat-label">Total Income</div>
-                        <div class="stat-value">{{ $activeBusiness->currency }} {{ number_format(array_sum($incomeSeries), 2) }}</div>
-                    </div>
+                    <a href="{{ route('books.create') }}"
+                    style="padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold; text-align: center;">
+                        Add New Book
+                    </a>
                 </div>
-            </div>
 
-            <div class="stat-card danger">
-                <div class="flex items-center mb-3">
-                    <div style="width: 32px; height: 32px; background: #fee2e2; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                        <svg style="width: 20px; height: 20px; color: var(--danger-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-label">Total Expense</div>
-                        <div class="stat-value">{{ $activeBusiness->currency }} {{ number_format(array_sum($expenseSeries), 2) }}</div>
-                    </div>
-                </div>
-            </div>
+                <div class="main-grid">
 
-            <div class="stat-card">
-                <div class="flex items-center mb-3">
-                    <div style="width: 32px; height: 32px; background: #eff6ff; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                        <svg style="width: 20px; height: 20px; color: var(--primary-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                    </div>
+                    {{-- Left Side (Books List) --}}
                     <div>
-                        <div class="stat-label">Net Profit</div>
-                        <div class="stat-value">{{ $activeBusiness->currency }} {{ number_format(array_sum($incomeSeries) - array_sum($expenseSeries), 2) }}</div>
-                    </div>
-                </div>
-            </div>
+                        <div id="booksContainer">
+                            @forelse($accessibleBooks as $book)
+                                @php
+                                    $allTransactions = $book->transactions;
+                                    $totalIncome = $allTransactions->where('type', 'income')->sum('amount');
+                                    $totalExpense = $allTransactions->where('type', 'expense')->sum('amount');
+                                    $netBalance = ($totalIncome ?? 0) - ($totalExpense ?? 0);
+                                @endphp
+                                <div
+                                    class="book-item"
+                                    data-name="{{ strtolower($book->name) }}"
+                                    data-updated="{{ $book->updated_at->timestamp }}"
+                                    data-created="{{ $book->created_at->timestamp }}"
+                                    data-netbalance="{{ $netBalance }}"
+                                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0;">
 
-            <div class="stat-card warning">
-                <div class="flex items-center mb-3">
-                    <div style="width: 32px; height: 32px; background: #fef3c7; border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                        <svg style="width: 20px; height: 20px; color: var(--warning-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-label">
-                            @if(in_array($role ?? '', ['owner', 'admin']))
-                                Books
-                            @else
-                                Accessible Books
-                            @endif
+                                    <a href="{{ route('books.show', $book->id) }}" class="book-item-link">
+
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="background: #f3e8ff; color: #7c3aed; border-radius: 50%; padding: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                <img src="{{ Storage::url('images/logo.svg') }}" alt="Book Logo" style="width: 24px; height: 24px; object-fit: cover;">
+                                            </div>
+                                            <div class="book-name">
+                                                <p style="margin: 0; font-weight: bold;">{{ $book['name'] }}</p>
+                                                <p style="margin: 0; color: gray; font-size: 12px;">Updated {{ $book['updated_at']->diffForHumans() }}</p>
+                                            </div>
+                                        </div>
+                                        <div style="font-weight: bold; color: {{ $netBalance < 0 ? '#dc2626' : '#16a34a' }};">
+                                            {{ $book->currency }} {{ $netBalance >= 0 ? '' : '-' }} {{ number_format(abs($netBalance), 0) }}
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
                         </div>
-                        <div class="stat-value">{{ isset($accessibleBookIds) ? $accessibleBookIds->count() : 0 }}</div>
+
+                        @if($accessibleBooks->isEmpty())
+                            <div style="text-align: center; padding: 20px; color: gray;">
+                                <p>No books available. Click the button above to add your first book.</p>
+                                <a href="{{ route('books.create') }}" style="color: #2563eb; text-decoration: none; font-weight: bold; border: 1px solid #2563eb; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-top: 10px;">
+                                    Add Your First Book
+                                </a>
+                            </div>
+                        @endif
+
+                        {{-- Quick Add --}}
+                        <div style="border: 1px solid #ddd; border-radius: 8px; margin-top: 20px; padding: 16px; background: white;">
+                            <h3 style="margin-top: 0; font-weight: bold;">Add New Book</h3>
+                            <p style="color: gray; font-size: 13px; margin-bottom: 12px;">Click to quickly add books for</p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
+                                    August Expenses
+                                </button>
+                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
+                                    Project Book
+                                </button>
+                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
+                                    2025 Ledger
+                                </button>
+                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
+                                    Payable Book
+                                </button>
+                            </div>
+                        </div>
                     </div>
+
+                    {{-- Right Side (Help Box) --}}
+                    <div class="help-box-desktop">
+                        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; background: white;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <div style="background: #f3f4f6; color: #4b5563; border-radius: 50%; padding: 8px;">
+                                    ❓
+                                </div>
+                                <h3 style="margin: 0; font-weight: bold;">Need Help?</h3>
+                            </div>
+                            <p style="color: gray; font-size: 13px; margin-bottom: 12px;">
+                                If you have any questions or need assistance, our support team is here to help you 24/7.
+                            </p>
+                            <button style="padding: 8px 16px; border-radius: 6px; border: none; background: #2563eb; color: white; cursor: pointer;">
+                                Contact Support
+                            </button>
+                            <p style="font-size: 12px; color: gray; margin-top: 12px;">
+                                Or visit our <a href="#" style="color: #2563eb; text-decoration: none;">Help Center</a> for FAQs and guides.
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const searchInput = document.getElementById('bookSearchInput');
+                    const sortSelect = document.getElementById('bookSortSelect');
+                    const booksContainer = document.getElementById('booksContainer');
+                    let bookItems = Array.from(booksContainer.querySelectorAll('.book-item'));
 
-        <!-- Charts -->
-        <div class="grid grid-cols-2" style="margin-top: 2rem;">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Income vs Expense (30 days)</h3>
-                </div>
-                <div class="card-body">
-                    <div style="position: relative; height: 300px; width: 100%;">
-                        <canvas id="lineChart"></canvas>
-                    </div>
-                </div>
-            </div>
+                    function filterAndSortBooks() {
+                        const query = searchInput.value.toLowerCase();
+                        const sortBy = sortSelect.value;
 
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Spending by Category</h3>
-                </div>
-                <div class="card-body">
-                    <div style="position: relative; height: 300px; width: 100%;">
-                        <canvas id="donutChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        // Filter items by search query
+                        let filtered = bookItems.filter(item => {
+                        return item.dataset.name.includes(query);
+                        });
 
-        <!-- Recent Transactions -->
-        <div style="margin-top: 2rem;">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Recent Transactions</h3>
-                </div>
-                <div class="card-body" style="padding: 0;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Category</th>
-                                <th>Type</th>
-                                <th style="text-align: right;">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                if (isset($accessibleBookIds) && $accessibleBookIds->isNotEmpty()) {
-                                    $recentTransactions = \App\Models\Transaction::where('business_id', $activeBusiness->id)
-                                        ->whereIn('book_id', $accessibleBookIds)
-                                        ->with(['category', 'book'])
-                                        ->orderBy('transaction_date', 'desc')
-                                        ->limit(5)
-                                        ->get();
-                                } else {
-                                    $recentTransactions = collect();
-                                }
-                            @endphp
-                            @forelse($recentTransactions as $transaction)
-                                <tr>
-                                    <td>{{ $transaction->transaction_date->format('M j, Y') }}</td>
-                                    <td>{{ $transaction->description ?: 'No description' }}</td>
-                                    <td>{{ $transaction->category?->name ?: '—' }}</td>
-                                    <td>
-                                        <span class="badge {{ $transaction->type === 'income' ? 'badge-success' : 'badge-danger' }}">
-                                            {{ ucfirst($transaction->type) }}
-                                        </span>
-                                    </td>
-                                    <td style="text-align: right; font-weight: 600; color: {{ $transaction->type === 'income' ? 'var(--success-color)' : 'var(--danger-color)' }};">
-                                        {{ $activeBusiness->currency }} {{ number_format($transaction->amount, 2) }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" style="text-align: center; color: var(--gray-500);">
-                                        @if(isset($hasAccess) && !$hasAccess)
-                                            No accessible transactions
-                                        @else
-                                            No transactions yet
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                @if($recentTransactions->count() > 0)
-                    <div class="card-footer">
-                        <a href="{{ route('transactions.index') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">View all transactions →</a>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Charts Script -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            // Line Chart
-            const lineCtx = document.getElementById('lineChart').getContext('2d');
-            new Chart(lineCtx, {
-                type: 'line',
-                data: {
-                    labels: @json($lineLabels),
-                    datasets: [
-                        {
-                            label: 'Income',
-                            data: @json($incomeSeries),
-                            borderColor: 'rgb(34, 197, 94)',
-                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'Expense',
-                            data: @json($expenseSeries),
-                            borderColor: 'rgb(239, 68, 68)',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            tension: 0.4,
-                            fill: true
+                        // Sort filtered items
+                        filtered.sort((a, b) => {
+                        switch (sortBy) {
+                            case 'name_asc':
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                            case 'net_high_low':
+                            return parseFloat(b.dataset.netbalance) - parseFloat(a.dataset.netbalance);
+                            case 'net_low_high':
+                            return parseFloat(a.dataset.netbalance) - parseFloat(b.dataset.netbalance);
+                            case 'created_desc':
+                            return parseInt(b.dataset.created) - parseInt(a.dataset.created);
+                            case 'updated_desc':
+                            default:
+                            return parseInt(b.dataset.updated) - parseInt(a.dataset.updated);
                         }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '{{ $activeBusiness->currency }} ' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': {{ $activeBusiness->currency }} ' + context.parsed.y.toLocaleString();
-                                }
-                            }
-                        }
+                        });
+
+                        // Clear container and re-append filtered & sorted items
+                        booksContainer.innerHTML = '';
+                        filtered.forEach(item => booksContainer.appendChild(item));
                     }
-                }
-            });
 
-            // Donut Chart
-            const donutCtx = document.getElementById('donutChart').getContext('2d');
-            new Chart(donutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: @json($categoryLabels),
-                    datasets: [{
-                        data: @json($categorySeries),
-                        backgroundColor: [
-                            '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
-                            '#06B6D4', '#F97316', '#84CC16', '#EC4899', '#6B7280'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': {{ $activeBusiness->currency }} ' + context.parsed.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        </script>
+                    // Run on input/select change
+                    searchInput.addEventListener('input', filterAndSortBooks);
+                    sortSelect.addEventListener('change', filterAndSortBooks);
+
+                    // Initial call
+                    filterAndSortBooks();
+                    });
+            </script>
         @endif
     @else
         <!-- No Business Selected -->

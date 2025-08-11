@@ -14,6 +14,7 @@ class Book extends Model
         'business_id',
         'name',
         'description',
+        'currency',
     ];
 
     public function business()

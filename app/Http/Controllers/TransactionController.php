@@ -83,6 +83,7 @@ class TransactionController extends Controller
         $data = $request->validate([
             'book_id' => 'required|exists:books,id',
             'category_id' => 'nullable|exists:categories,id',
+            'new_category' => 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0.01',
             'type' => 'required|in:income,expense',
             'transaction_date' => 'required|date',
@@ -90,8 +91,17 @@ class TransactionController extends Controller
             'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
         ]);
 
+        // If new category is provided, create or find it
+        if (!empty($data['new_category'])) {
+            // Optional: you can add business_id to categories table to scope categories per business
+            $category = Category::firstOrCreate(
+                ['name' => $data['new_category'], 'business_id' => $business->id]
+            );
+            $data['category_id'] = $category->id;
+        }
+
         // Check book access and get user's role in this specific book
-        $book = \App\Models\Book::findOrFail($data['book_id']);
+        $book = Book::findOrFail($data['book_id']);
 
         // Ensure book belongs to the current business
         abort_unless($book->business_id === $business->id, 404);
@@ -125,9 +135,15 @@ class TransactionController extends Controller
             default => 'pending'      // Default to pending for safety
         };
 
-        $transaction = new Transaction($data + [
+        $transaction = new Transaction([
             'business_id' => $business->id,
             'user_id' => $user->id,
+            'book_id' => $data['book_id'],
+            'category_id' => $data['category_id'] ?? null,
+            'amount' => $data['amount'],
+            'type' => $data['type'],
+            'transaction_date' => $data['transaction_date'],
+            'description' => $data['description'] ?? null,
             'status' => $status,
         ]);
 
@@ -150,6 +166,9 @@ class TransactionController extends Controller
                 'book_role' => $bookRole
             ],
         ]);
+
+        // update book updated_at timestamp
+        $book->touch();
 
         // Notify admins/owners when transaction needs approval (status is pending)
         if ($status === 'pending') {
@@ -214,6 +233,7 @@ class TransactionController extends Controller
                 'transaction' => [
                     'id' => $transaction->id,
                     'type' => $transaction->type,
+                    'mode' => $transaction->mode,
                     'amount' => $transaction->amount,
                     'transaction_date' => $transaction->transaction_date->format('Y-m-d\TH:i'),
                     'category_id' => $transaction->category_id,
@@ -259,8 +279,10 @@ class TransactionController extends Controller
         $data = $request->validate([
             'book_id' => 'required|exists:books,id',
             'category_id' => 'nullable|exists:categories,id',
+            'new_category' => 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0.01',
             'type' => 'required|in:income,expense',
+            'mode' => 'required|string|max:50',
             'transaction_date' => 'required|date',
             'description' => 'nullable|string',
             'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
@@ -275,6 +297,14 @@ class TransactionController extends Controller
             $data['image_path'] = $path;
         }
 
+        // If new category is provided, create or find it
+        if (!empty($data['new_category'])) {
+            $category = Category::firstOrCreate(
+                ['name' => $data['new_category'], 'business_id' => $business->id]
+            );
+            $data['category_id'] = $category->id;
+        }
+
         $transaction->update($data);
 
         ActivityLog::create([
@@ -285,6 +315,10 @@ class TransactionController extends Controller
             'subject_id' => $transaction->id,
             'details' => [ 'amount' => $transaction->amount, 'type' => $transaction->type ],
         ]);
+
+        // update book updated_at timestamp
+        $book = $transaction->book;
+        $book->touch();
 
         // Handle AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
@@ -342,6 +376,10 @@ class TransactionController extends Controller
             'details' => [ 'amount' => $transaction->amount, 'type' => $transaction->type ],
         ]);
 
+        // update book updated_at timestamp
+        $book = $transaction->book;
+        $book->touch();
+
         // Handle AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -351,6 +389,82 @@ class TransactionController extends Controller
         }
 
         return redirect()->route('transactions.index');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:transactions,id',
+        ]);
+
+        $user = $request->user();
+        $business = $request->attributes->get('activeBusiness');
+        $transactions = Transaction::whereIn('id', $request->ids)->get();
+
+        // First, authorize all transactions before deleting any
+        foreach ($transactions as $transaction) {
+            // Ensure transaction belongs to the active business
+            if ($transaction->business_id !== $business->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'One or more transactions do not belong to the active business.'
+                ], 403);
+            }
+
+            // Check permissions using the same logic as the single destroy method
+            $businessRole = $user->businesses()->where('business_id', $business->id)->value('role');
+            $canDelete = false;
+
+            if (in_array($businessRole, ['owner', 'admin'])) {
+                $canDelete = true;
+            } else {
+                $bookUser = $user->books()->where('books.id', $transaction->book_id)->first();
+                if ($bookUser) {
+                    $bookRole = $bookUser->pivot->role;
+                    if (in_array($bookRole, ['manager', 'editor']) && $transaction->user_id === $user->id) {
+                        $canDelete = true;
+                    }
+                }
+            }
+
+            if (!$canDelete) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to delete one or more of the selected transactions.'
+                ], 403);
+            }
+        }
+
+        // If authorization passes for all, proceed with deletion
+        foreach ($transactions as $transaction) {
+            // Delete receipt file if it exists
+            if ($transaction->image_path && Storage::exists($transaction->image_path)) {
+                Storage::delete($transaction->image_path);
+            }
+
+            // Log the deletion activity for each transaction
+            ActivityLog::create([
+                'action'       => 'transaction.deleted',
+                'user_id'      => $user->id,
+                'business_id'  => $business->id,
+                'subject_type' => Transaction::class,
+                'subject_id'   => $transaction->id,
+                'details'      => ['amount' => $transaction->amount, 'type' => $transaction->type],
+            ]);
+        }
+
+        // update book updated_at timestamp
+        $book = $transaction->book;
+        $book->touch();
+
+        // Perform the bulk delete from the database
+        Transaction::destroy($request->ids);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Selected transactions have been deleted successfully.'
+        ]);
     }
 
     public function approve(Request $request, Transaction $transaction)
@@ -370,6 +484,10 @@ class TransactionController extends Controller
         if ($transaction->user && (method_exists($transaction->user, 'wantsNotification') ? $transaction->user->wantsNotification('transaction_approved') : true)) {
             $transaction->user->notify(new TransactionApproved($transaction));
         }
+
+        // update book updated_at timestamp
+        $book = $transaction->book;
+        $book->touch();
 
         // Handle AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
@@ -399,6 +517,10 @@ class TransactionController extends Controller
         if ($transaction->user && (method_exists($transaction->user, 'wantsNotification') ? $transaction->user->wantsNotification('transaction_rejected') : true)) {
             $transaction->user->notify(new TransactionRejected($transaction));
         }
+
+        // update book updated_at timestamp
+        $book = $transaction->book;
+        $book->touch();
 
         // Handle AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
@@ -485,6 +607,8 @@ class TransactionController extends Controller
                 return 'rejected';
             case 'transaction.deleted':
                 return 'deleted';
+            case 'transaction.imported':
+                return 'created';
             default:
                 return 'other';
         }
@@ -503,6 +627,8 @@ class TransactionController extends Controller
                 return 'Transaction Rejected';
             case 'transaction.deleted':
                 return 'Transaction Deleted';
+            case 'transaction.imported':
+                return 'Transaction Imported';
             default:
                 return 'Activity';
         }
@@ -526,6 +652,10 @@ class TransactionController extends Controller
             case 'transaction.deleted':
                 $amount = $details['amount'] ?? 'N/A';
                 return "Deleted transaction for amount {$amount}";
+            case 'transaction.imported':
+                $amount = $details['amount'] ?? 'N/A';
+                $type = $details['type'] ?? 'N/A';
+                return "Imported transaction - {$type} for amount {$amount}";
             default:
                 return "Activity performed on transaction";
         }

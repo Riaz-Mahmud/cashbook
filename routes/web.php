@@ -1,9 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BusinessSwitcherController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TransactionImportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -11,9 +15,7 @@ Route::get('/', function () {
 
 Route::get('/privacy', function () { return view('privacy'); })->name('privacy');
 
-Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)
-    ->middleware(['auth', 'verified', 'active.business'])
-    ->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified', 'active.business'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     // Business selection and core resources
@@ -38,13 +40,24 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::resource('categories', \App\Http\Controllers\CategoryController::class)->except(['show']);
-    Route::resource('transactions', \App\Http\Controllers\TransactionController::class);
+    Route::get('transactions/create', [\App\Http\Controllers\TransactionController::class, 'create'])->name('transactions.create');
+    Route::post('transactions', [\App\Http\Controllers\TransactionController::class, 'store'])->name('transactions.store');
+    Route::get('transactions/{transaction}/edit', [\App\Http\Controllers\TransactionController::class, 'edit'])->name('transactions.edit');
+    Route::put('transactions/{transaction}', [\App\Http\Controllers\TransactionController::class, 'update'])->name('transactions.update');
+    Route::delete('transactions/{transaction}', [\App\Http\Controllers\TransactionController::class, 'destroy'])->name('transactions.destroy');
+    Route::post('/transactions/bulk-delete', [TransactionController::class, 'bulkDelete'])->name('transactions.bulk-delete');
     Route::get('transactions/{transaction}/detail', [\App\Http\Controllers\TransactionController::class, 'detail'])->name('transactions.detail');
     Route::post('transactions/{transaction}/approve', [\App\Http\Controllers\TransactionController::class, 'approve'])->name('transactions.approve');
     Route::post('transactions/{transaction}/reject', [\App\Http\Controllers\TransactionController::class, 'reject'])->name('transactions.reject');
     Route::get('transactions/{transaction}/receipt', [\App\Http\Controllers\TransactionController::class, 'receipt'])->name('transactions.receipt');
-    Route::get('reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
-    Route::post('reports/export', [\App\Http\Controllers\ReportController::class, 'export'])->name('reports.export');
+
+    // Transaction Import Routes
+    Route::get('/books/{book}/transactions/import', [TransactionImportController::class, 'create'])->name('transactions.import.create');
+    Route::post('/books/{book}/transactions/import', [TransactionImportController::class, 'store'])->name('transactions.import.store');
+    Route::get('/books/{book}/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/books/{book}/reports', [ReportController::class, 'generate'])->name('reports.generate');
+    Route::get('/books/{book}/reports/download', [ReportController::class, 'download'])->name('reports.download');
+
     Route::resource('recurring-transactions', \App\Http\Controllers\RecurringTransactionController::class)->except(['show']);
     Route::get('budgets', [\App\Http\Controllers\BudgetController::class, 'index'])->name('budgets.index');
     Route::post('budgets', [\App\Http\Controllers\BudgetController::class, 'store'])->name('budgets.store');

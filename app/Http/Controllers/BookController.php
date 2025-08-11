@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Category;
 use App\Models\User;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Helpers\CommonHelper;
 
 class BookController extends Controller
 {
@@ -19,11 +20,12 @@ class BookController extends Controller
 
         if (in_array($role, ['owner', 'admin'])) {
             // Owners and admins can see all books with access information
-            $allBooks = Book::where('business_id', $business->id)->get();
+            $allBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
             $userBookIds = $user->books()->where('business_id', $business->id)->pluck('books.id')->toArray();
 
             $books = $allBooks->map(function($book) use ($userBookIds) {
                 $book->user_has_access = in_array($book->id, $userBookIds);
+                $book->hashId = CommonHelper::encodeId($book->id);
                 return $book;
             });
         } else {
@@ -31,11 +33,12 @@ class BookController extends Controller
             $assignedBookIds = $user->books()->where('business_id', $business->id)->pluck('books.id');
             $books = Book::where('business_id', $business->id)
                         ->whereIn('id', $assignedBookIds)
-                        ->get();
+                        ->latest('updated_at')->get();
 
             // For staff, all visible books have access
             $books = $books->map(function($book) {
                 $book->user_has_access = true;
+                $book->hashId = CommonHelper::encodeId($book->id);
                 return $book;
             });
         }
@@ -51,6 +54,7 @@ class BookController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'currency' => 'required|string',
         ]);
 
         $book = Book::create($data + ['business_id' => $business->id]);
@@ -73,6 +77,7 @@ class BookController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'currency' => 'required|string',
         ]);
         $book->update($data);
         return redirect()->route('books.index');
@@ -87,7 +92,7 @@ class BookController extends Controller
 
     public function show(Request $request, Book $book)
     {
-    // Ensure the book belongs to the active business and the user can view it
+        // Ensure the book belongs to the active business and the user can view it
         $business = $request->attributes->get('activeBusiness');
         $user = $request->user();
 
@@ -112,7 +117,9 @@ class BookController extends Controller
             ->paginate(15);
         $categories = Category::where('business_id', $business->id)->get();
 
-        return view('books.show', compact('book','transactions','categories','bookRole'));
+        $modes = $book->transactions()->distinct()->pluck('mode')->filter()->values();
+
+        return view('books.show', compact('book','transactions','categories','bookRole','modes'));
     }
 
     public function transactionsData(Request $request, Book $book)
@@ -139,6 +146,10 @@ class BookController extends Controller
 
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('mode')) {
+            $query->where('mode', $request->mode);
         }
 
         if ($request->filled('search')) {
@@ -182,17 +193,18 @@ class BookController extends Controller
 
         $transactions = $query->skip($start)->take($length)->get();
 
-        $data = $transactions->map(function ($transaction) use ($business, $request) {
+        $data = $transactions->map(function ($transaction) use ($business, $book, $request) {
             return [
                 'id' => $transaction->id,
                 'transaction_date' => $transaction->transaction_date->format('M j, Y h:i A'),
                 'description' => $transaction->description ?: '—',
                 'category' => $transaction->category?->name ?: '—',
+                'mode' => $transaction->mode ? ucfirst($transaction->mode) : '—',
                 'type' => '<span class="badge ' . ($transaction->type === 'income' ? 'badge-success' : 'badge-danger') . '">' .
                          ucfirst($transaction->type) . '</span>',
                 'amount' => '<span style="font-weight: 600; color: ' .
                            ($transaction->type === 'income' ? 'var(--success-color)' : 'var(--danger-color)') . ';">' .
-                           $business->currency . ' ' . number_format($transaction->amount, 2) . '</span>',
+                           $book->currency . ' ' . number_format($transaction->amount, 2) . '</span>',
                 'status' => '<span class="badge ' .
                            ($transaction->status === 'approved' ? 'badge-success' :
                            ($transaction->status === 'pending' ? 'badge-warning' : 'badge-danger')) . '">' .
@@ -234,6 +246,10 @@ class BookController extends Controller
 
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('mode')) {
+            $query->where('mode', $request->mode);
         }
 
         if ($request->filled('search')) {

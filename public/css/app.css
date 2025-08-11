@@ -47,19 +47,30 @@ body {
 .app-header {
     background: white;
     border-bottom: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    padding: 0.5rem 1rem;
+    position: relative; /* Ensure header is a stacking context */
+    z-index: 20;       /* Place header above main content */
 }
 
 .header-content {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 1rem 2rem;
-    /* max-width: 1200px; */
-    margin: 0 auto;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap; /* Prevent stacking */
+}
+.header-content > div {
+    flex-shrink: 1; /* Allow shrinking instead of wrapping */
+    min-width: 0; /* Prevent flexbox overflow */
+}
+
+.header-content .dropdown > button span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .app-logo {
@@ -78,11 +89,14 @@ body {
 }
 
 .app-sidebar {
-    width: 250px;
+    flex-shrink: 0;
+    width: 260px; /* adjust as needed */
+    height: 100vh;
+    overflow-y: auto; /* sidebar scroll if content is too tall */
+    position: sticky;
+    top: 0;
     background: white;
     border-right: 1px solid var(--gray-200);
-    padding: 1.5rem;
-    min-height: calc(100vh - 73px);
 }
 
 .app-content {
@@ -141,7 +155,7 @@ body {
 }
 
 .sidebar-section {
-    margin-bottom: 2rem;
+    padding: 1.5rem;
 }
 
 .sidebar-title {
@@ -618,15 +632,11 @@ body {
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
+    z-index: 3000; /* Higher than header, sidebar, app-main */
+    background-color: #fff;
     border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
-    min-width: 200px;
-    z-index: 50;
-    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dropdown-item {
@@ -709,38 +719,6 @@ body {
     border-color: var(--primary-color);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .app-main {
-        flex-direction: column;
-    }
-
-    .app-sidebar {
-        width: 100%;
-        min-height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--gray-200);
-    }
-
-    .app-content {
-        padding: 1rem;
-    }
-
-    .page-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .grid-cols-2,
-    .grid-cols-3,
-    .grid-cols-4 {
-        grid-template-columns: 1fr;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* Welcome Page Styles */
 .hero-section {
@@ -1372,26 +1350,6 @@ body {
     margin-left: auto;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .dataTables_wrapper .row:last-child {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .dataTables_wrapper .row:last-child .col-sm-12.col-md-7 {
-        margin-left: 0;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        min-width: 2.25rem;
-        height: 2.25rem;
-        padding: 0 0.5rem;
-        font-size: 0.8125rem;
-    }
-}
-
 /* Empty State Styling */
 .dataTables_wrapper .dataTables_empty {
     text-align: center;
@@ -1461,9 +1419,313 @@ body {
     font-size: 0.875rem;
 }
 
-/* Responsive adjustments for modal */
+
+/* Base styles to override inline rigid layouts */
+.dashboard-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.search-sort-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.search-sort-container input,
+.search-sort-container select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* This applies to desktop */
+.main-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+}
+
+/* This applies to mobile (screens <= 768px) */
 @media (max-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr; /* Stacks the columns */
+  }
+}
+
+/* Sidebar Overlay for mobile */
+.sidebar-overlay {
+    display: none; /* Hidden by default */
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .dataTables_wrapper .row:last-child {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .dataTables_wrapper .row:last-child .col-sm-12.col-md-7 {
+        margin-left: 0;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        min-width: 2.25rem;
+        height: 2.25rem;
+        padding: 0 0.5rem;
+        font-size: 0.8125rem;
+    }
+    .app-main {
+        flex-direction: column;
+    }
+
+    .app-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        z-index: 1000;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .app-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .app-content {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-cols-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .main-grid {
+        grid-template-columns: 1fr; /* Stack columns */
+    }
+    .search-sort-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-sort-container input,
+    .search-sort-container select {
+        width: 100%;
+    }
+
     .transaction-detail-modal {
         width: 100%;
+    }
+    .transaction-detail-modal .modal-content {
+        width: 100vw;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .book-item {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 8px;
+    }
+    .book-item a {
+        width: 100%; /* Make sure it takes full width */
+        /* The other properties like flex-direction are removed */
+    }
+    .book-name p {
+        font-size: 14px;
+    }
+
+}
+
+/* Show 3-dot toggle only on mobile */
+.mobile-sidebar-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: none;
+    color: var(--gray-600);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .mobile-sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Default state: Hide the help box */
+.help-box-desktop {
+    display: none;
+}
+
+/* Show the help box only on screens wider than 768px */
+@media (min-width: 769px) {
+    .help-box-desktop {
+        display: block;
+    }
+}
+.book-item-link {
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    transition: background-color 0.3s ease;
+}
+
+.book-item-link:hover {
+    background-color: #aeceeb65;
+}
+
+/* Redesigned Page Header Styles */
+.page-header-redesigned {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 1.5rem;
+}
+
+.page-header-left,
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.page-header-back-btn {
+    color: var(--gray-600);
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.page-header-back-btn:hover {
+    background-color: var(--gray-100);
+}
+
+.page-header-back-btn svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.page-header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.page-header-title-group .page-title {
+    font-size: 1.5rem; /* Slightly smaller to fit icons */
+    margin-bottom: 0;
+}
+
+.page-header-icon-btn {
+    color: var(--gray-500);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.page-header-icon-btn:hover {
+    background-color: var(--gray-100);
+    color: var(--primary-color);
+}
+
+.page-header-icon-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Responsive adjustments for the new header */
+@media (max-width: 768px) {
+    .page-header-redesigned {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header-left {
+        order: 1; /* Title section first */
+    }
+
+    .page-header-right {
+        order: 2; /* Buttons section second */
+        justify-content: stretch;
+    }
+
+    .page-header-right .btn {
+        flex-grow: 1; /* Make buttons take equal space */
+    }
+}
+
+/* App Logo Styles */
+.app-logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--gray-900);
+}
+
+.app-logo-icon {
+    height: 2rem; /* 32px */
+    width: 2rem;  /* 32px */
+}
+
+.app-logo-text {
+    margin-left: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    white-space: nowrap; /* Prevents the text from wrapping */
+    transition: all 0.2s ease-in-out;
+}
+
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+    .app-logo-text {
+        display: none; /* Hide the text on small screens */
     }
 }

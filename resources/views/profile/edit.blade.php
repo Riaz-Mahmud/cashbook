@@ -16,13 +16,35 @@
 
                 <div>
                     <x-input-label for="name" :value="__('Name')" />
-                    <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+                    <x-text-input
+                        id="name"
+                        name="name"
+                        type="text"
+                        style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.3)'"
+                        onblur="this.style.borderColor='var(--gray-300, #d1d5db)'; this.style.boxShadow='none'"
+                        :value="old('name', $user->name)"
+                        required
+                        autofocus
+                        autocomplete="name"
+                    />
+
                     <x-input-error class="mt-2" :messages="$errors->get('name')" />
                 </div>
 
                 <div>
                     <x-input-label for="email" :value="__('Email')" />
-                    <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+                    <x-text-input
+                        id="email"
+                        name="email"
+                        type="email"
+                        style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.3)'"
+                        onblur="this.style.borderColor='var(--gray-300, #d1d5db)'; this.style.boxShadow='none'"
+                        :value="old('email', $user->email)"
+                        required
+                        autocomplete="username"
+                    />
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
                     @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
@@ -45,7 +67,9 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 1.5rem;">
-                    <x-primary-button>{{ __('Save') }}</x-primary-button>
+                    <x-primary-button style="padding: 0.75rem 1.5rem; background: #3b82f6; color: #fff; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.01); transition: background 0.2s, color 0.2s;">
+                        {{ __('Save') }}
+                    </x-primary-button>
 
                     @if (session('status') === 'profile-updated')
                         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" style="font-size: 0.95rem; color: var(--gray-600);">{{ __('Saved.') }}</p>
@@ -65,24 +89,50 @@
 
                 <div>
                     <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-                    <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
+                    <x-text-input
+                        id="update_password_current_password"
+                        name="current_password"
+                        type="password"
+                        style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.3)'"
+                        onblur="this.style.borderColor='var(--gray-300, #d1d5db)'; this.style.boxShadow='none'"
+                        autocomplete="current-password"
+                    />
                     <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
                 </div>
 
                 <div>
                     <x-input-label for="update_password_password" :value="__('New Password')" />
-                    <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+                    <x-text-input
+                        id="update_password_password"
+                        name="password"
+                        type="password"
+                        style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.3)'"
+                        onblur="this.style.borderColor='var(--gray-300, #d1d5db)'; this.style.boxShadow='none'"
+                        autocomplete="new-password"
+                    />
                     <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
                 </div>
 
                 <div>
                     <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-                    <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+                    <x-text-input
+                        id="update_password_password_confirmation"
+                        name="password_confirmation"
+                        type="password"
+                        style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.3)'"
+                        onblur="this.style.borderColor='var(--gray-300, #d1d5db)'; this.style.boxShadow='none'"
+                        autocomplete="new-password"
+                    />
                     <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 1.5rem;">
-                    <x-primary-button>{{ __('Save') }}</x-primary-button>
+                    <x-primary-button style="padding: 0.75rem 1.5rem; background: #3b82f6; color: #fff; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.01); transition: background 0.2s, color 0.2s;">
+                        {{ __('Save') }}
+                    </x-primary-button>
 
                     @if (session('status') === 'password-updated')
                         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" style="font-size: 0.95rem; color: var(--gray-600);">{{ __('Saved.') }}</p>
@@ -127,7 +177,9 @@
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-1 block w-3/4"
+                    style="width: 75%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+                    onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.3)'"
+                    onblur="this.style.borderColor='var(--gray-300, #d1d5db)'; this.style.boxShadow='none'"
                     placeholder="{{ __('Password') }}"
                 />
 
@@ -135,7 +187,7 @@
             </div>
 
             <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
-                <x-secondary-button x-on:click="$dispatch('close')">
+                <x-secondary-button x-on:click="$dispatch('close')" style="padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.85rem; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.01); transition: background 0.2s, color 0.2s; cursor: pointer;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
                     {{ __('Cancel') }}
                 </x-secondary-button>
 

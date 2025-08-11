@@ -40,7 +40,7 @@ class DashboardController extends Controller
         // Determine which books the user can access
         if (in_array($role, ['owner', 'admin'])) {
             // Owners and admins can see all business data
-            $accessibleBooks = Book::where('business_id', $business->id)->get();
+            $accessibleBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
             $accessibleBookIds = $accessibleBooks->pluck('id');
             $hasAccess = true;
         } else {
