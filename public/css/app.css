@@ -631,12 +631,15 @@ body {
 }
 
 .dropdown-menu {
-    position: absolute;
-    z-index: 3000; /* Higher than header, sidebar, app-main */
-    background-color: #fff;
-    border: 1px solid var(--gray-200);
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 100%; /* right below the button */
+  left: 0;
+  z-index: 50;
+  min-width: 150px; /* or auto */
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .dropdown-item {

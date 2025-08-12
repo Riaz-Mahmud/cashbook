@@ -18,7 +18,7 @@
                         name="name"
                         type="text"
                         style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--gray-300, #d1d5db); border-radius: 0.5rem; font-size: 0.95rem; color: var(--gray-900); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
-                        value="{{ old('name') }}"
+                        value="{{ old('name', request()->input('name')) }}"
                         required
                         autofocus
                         placeholder="e.g., General Ledger, Marketing Campaign, Q4 Operations"

@@ -56,7 +56,7 @@
                 <div style="display: flex; flex: 1 1 100%; gap: 20px; flex-wrap: wrap;">
 
                     {{-- Left Side (Books List) --}}
-                    <div style="flex: 1 1 60%; min-width: 320px; max-width: 720px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; box-sizing: border-box;">
+                    <div style="flex: 1 1 60%; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; box-sizing: border-box;">
 
                         <div id="booksContainer" style="max-height: 600px; overflow-y: auto;">
                             @forelse($accessibleBooks as $book)
@@ -107,18 +107,18 @@
                             <h3 style="margin-top: 0; font-weight: bold;">Add New Book</h3>
                             <p style="color: gray; font-size: 13px; margin-bottom: 12px;">Click to quickly add books for</p>
                             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
-                                    August Expenses
-                                </button>
-                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
+                                <a href="{{ route('books.create', ['name' => Date::now()->monthName . ' Expenses']) }}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer; text-decoration: none;">
+                                    {{ Date::now()->monthName }} Expenses
+                                </>
+                                <a href="{{ route('books.create', ['name' => 'Project Book']) }}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer; text-decoration: none;">
                                     Project Book
-                                </button>
-                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
-                                    2025 Ledger
-                                </button>
-                                <button style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer;">
+                                </a>
+                                <a href="{{ route('books.create', ['name' => Date::now()->year . ' Ledger']) }}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer; text-decoration: none;">
+                                    {{ Date::now()->year }} Ledger
+                                </a>
+                                <a href="{{ route('books.create', ['name' => 'Payable Book']) }}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #93c5fd; color: #2563eb; background: white; cursor: pointer; text-decoration: none;">
                                     Payable Book
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

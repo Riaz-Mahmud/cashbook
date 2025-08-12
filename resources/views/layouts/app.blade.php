@@ -103,17 +103,19 @@
 
                 <!-- Right: User Menu -->
                 <div class="flex items-center">
-                    <div class="dropdown" x-data="{ open: false }">
+                    <div class="dropdown" x-data="{ open: false }" style="position: relative;">
                         <button @click="open = !open" class="flex items-center" style="background: transparent; border: none; padding: 0; cursor: pointer;">
                             <div style="width: 32px; height: 32px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
                                 <span style="color: white; font-weight: 500; font-size: 0.875rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                             </div>
-                            <span style="color: var(--gray-700); font-weight: 500;">{{ Auth::user()->name }}</span>
+                            <span style="color: var(--gray-700); font-weight: 500;" class="hidden sm:inline-block">
+                                {{ Str::limit(Auth::user()->name, 5) }}
+                            </span>
                             <svg style="width: 16px; height: 16px; margin-left: 4px; color: var(--gray-400);" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                         </button>
-                        <div x-show="open" @click.away="open = false" x-transition class="dropdown-menu slide-down">
+                        <div x-show="open" @click.away="open = false" x-transition class="dropdown-menu slide-down max-w-xs overflow-auto">
                             <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-200);">
                                 <div style="font-weight: 500; color: var(--gray-900);">{{ Auth::user()->name }}</div>
                                 <div style="font-size: 0.75rem; color: var(--gray-500);">{{ Auth::user()->email }}</div>
@@ -144,15 +146,57 @@
                         @if (Route::currentRouteName() === 'dashboard')
                             <h2 class="sidebar-title">Dashboard</h2>
                             {{-- show user name and image and show profile link --}}
-                            <nav class="sidebar-nav" style="border: 1px solid var(--gray-200); border-radius: 6px;">
-                                <a href="{{ route('profile.edit') }}" class="nav-link" style="margin-bottom: 0;">
-                                    <div class="flex items-center">
-                                        <div class="avatar" style="width: 32px; height: 32px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
-                                            <span style="color: white; font-weight: 500; font-size: 0.875rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
-                                        </div>
-                                        <span>{{ Auth::user()->name }}</span>
+                            <nav class="sidebar-nav">
+                                <div class="flex items-center" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <div class="avatar" style="width: 32px; height: 32px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                                        <span style="color: white; font-weight: 500; font-size: 0.875rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                                     </div>
+                                    <span>{{ Auth::user()->name }}</span>
+                                </div>
+
+                                <a href="{{ route('dashboard') }}" class="nav-link active" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- Home / Dashboard Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9v9a3 3 0 01-3 3h-3a3 3 0 01-3-3v-6H6a3 3 0 00-3 3v3z"/>
+                                    </svg>
+                                    <span>Dashboard</span>
                                 </a>
+
+                                <a href="{{ route('businesses.index') }}" class="nav-link" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- Briefcase / Businesses Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></rect>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7V5a4 4 0 00-8 0v2"></path>
+                                    </svg>
+                                    <span>Businesses</span>
+                                </a>
+
+                                <a href="{{ route('profile.edit') }}" class="nav-link" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- User / Profile Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 21a6.5 6.5 0 0113 0"></path>
+                                    </svg>
+                                    <span>Profile</span>
+                                </a>
+
+                                {{-- sign out --}}
+                                <form method="POST" action="{{ route('logout') }}" class="mt-4">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        class="nav-link"
+                                        style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--danger-color); cursor: pointer;"
+                                        onclick="return confirm('Are you sure you want to sign out?')"
+                                    >
+                                        <!-- Sign Out Icon -->
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6-8V3a2 2 0 00-2-2H5a2 2 0 00-2 2v18a2 2 0 002 2h10a2 2 0 002-2v-3"></path>
+                                        </svg>
+                                        <span>Sign Out</span>
+                                    </button>
+                                </form>
+
                             </nav>
                         @else
                             <div class="flex items-center justify-between mb-4">
@@ -219,7 +263,7 @@
             <div class="footer-left" style="font-size: 0.75rem; color: var(--gray-500);">
                 &copy; {{ date('Y') }} CashBook. All rights reserved.
                 <div class="footer-center" style="font-size: 0.65rem; color: var(--gray-400);">
-                    &copy; Riaz
+                    - Riaz
                 </div>
             </div>
             <div class="footer-right" style="display: flex; align-items: center; gap: 1rem;">

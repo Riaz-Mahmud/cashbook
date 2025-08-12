@@ -50,70 +50,92 @@
 
     </div>
 
+    <!-- Add Alpine.js state to manage filter visibility -->
+    <div x-data="{ showFilters: false }">
+
+        <!-- Filter Toggle Button (visible only on small screens) -->
+        <button
+            @click="showFilters = !showFilters"
+            class="btn btn-primary md:hidden mb-4"
+            aria-expanded="false"
+            aria-controls="filter-section">
+            Filter
+            <svg :class="{'transform rotate-180': showFilters}" class="inline-block w-4 h-4 ml-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+
+        <!-- Filters and Summary Section -->
+        <div id="filter-section" class="card mb-4" :class="{'block': showFilters, 'hidden': !showFilters, 'md:block': true}" >
+            <div class="card-body">
+                <!-- Filter Options -->
+                <div class="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-6">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Duration</label>
+                        <select class="form-select" style="font-size: 0.875rem;">
+                            <option value="">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this_week">This Week</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_year">This Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Types</label>
+                        <select class="form-select" style="font-size: 0.875rem;">
+                            <option value="">All</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Members</label>
+                        <select class="form-select" style="font-size: 0.875rem;">
+                            <option value="">All</option>
+                            @foreach($book->business->users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Payment Modes</label>
+                        <select class="form-select" style="font-size: 0.875rem;">
+                            <option value="">All</option>
+                            @foreach($modes as $mode)
+                                <option value="{{ $mode }}">{{ ucfirst($mode) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Categories</label>
+                        <select class="form-select" style="font-size: 0.875rem;">
+                            <option value="">All</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <input type="text" class="form-input" placeholder="Search by remark or amount..." style="font-size: 0.875rem;">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters and Summary Section -->
     <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-body">
-            <!-- Filter Options -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Duration</label>
-                    <select class="form-select" style="font-size: 0.875rem;">
-                        <option value="">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="yesterday">Yesterday</option>
-                        <option value="this_week">This Week</option>
-                        <option value="last_week">Last Week</option>
-                        <option value="this_month">This Month</option>
-                        <option value="last_month">Last Month</option>
-                        <option value="this_year">This Year</option>
-                        <option value="custom">Custom Range</option>
-                    </select>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Types</label>
-                    <select class="form-select" style="font-size: 0.875rem;">
-                        <option value="">All</option>
-                        <option value="income">Income</option>
-                        <option value="expense">Expense</option>
-                    </select>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Members</label>
-                    <select class="form-select" style="font-size: 0.875rem;">
-                        <option value="">All</option>
-                        @foreach($book->business->users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Payment Modes</label>
-                    <select class="form-select" style="font-size: 0.875rem;">
-                        <option value="">All</option>
-                        @foreach($modes as $mode)
-                            <option value="{{ $mode }}">{{ ucfirst($mode) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="font-size: 0.875rem; margin-bottom: 0.5rem;">Categories</label>
-                    <select class="form-select" style="font-size: 0.875rem;">
-                        <option value="">All</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <!-- Search Bar -->
-            <div class="form-group" style="margin-bottom: 1.5rem;">
-                <input type="text" class="form-input" placeholder="Search by remark or amount..." style="font-size: 0.875rem;">
-            </div>
 
             <!-- Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
