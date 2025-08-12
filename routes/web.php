@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('books/{book}/users/search', [\App\Http\Controllers\BookController::class, 'searchUsers'])->name('books.users.search');
 
     // Book user management routes (admin/owner only)
-    Route::middleware('business.role:owner,admin')->group(function() {
+    Route::middleware('business.role:owner,admin,manager')->group(function() {
         Route::get('books/{book}/users', [\App\Http\Controllers\BookController::class, 'users'])->name('books.users');
         Route::post('books/{book}/users/invite', [\App\Http\Controllers\BookController::class, 'inviteUser'])->name('books.users.invite');
         Route::put('books/{book}/users/{user}/role', [\App\Http\Controllers\BookController::class, 'updateUserRole'])->name('books.users.role');

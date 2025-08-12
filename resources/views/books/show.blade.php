@@ -778,7 +778,6 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     showNotification('An error occurred while deleting transactions.', 'error');
                 });
             }
@@ -823,7 +822,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error fetching transaction details:', error);
                 showNotification('Error loading transaction details: ' + error.message, 'error');
             });
         }
@@ -976,7 +974,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error updating summary:', error);
+                showNotification('Error updating summary cards', 'error');
             });
         }
 
@@ -1063,7 +1061,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 showNotification('Error adding transaction', 'error');
             })
             .finally(() => {
@@ -1125,7 +1122,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error fetching transaction data:', error);
                 showNotification('Error loading transaction data: ' + error.message, 'error');
             });
         }
@@ -1153,7 +1149,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 showNotification('Error deleting transaction', 'error');
             });
         }
@@ -1234,7 +1229,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 showNotification('Error updating transaction: ' + error.message, 'error');
             })
             .finally(() => {
@@ -1296,7 +1290,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error fetching transaction data:', error);
                 showNotification('Error loading transaction data: ' + error.message, 'error');
             });
         }
@@ -1327,7 +1320,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 showNotification('Error deleting transaction', 'error');
             });
         }
@@ -1354,7 +1346,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 showNotification('Error approving transaction', 'error');
             });
         }
@@ -1381,7 +1372,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 showNotification('Error rejecting transaction', 'error');
             });
         }
@@ -1486,7 +1476,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error searching users:', error);
                 resultsDiv.innerHTML = '<div style="padding: 0.75rem; color: var(--danger-color);">Error searching users</div>';
                 resultsDiv.style.display = 'block';
             });
@@ -1570,10 +1559,11 @@
             .then(data => {
                 if (data.success) {
                     displayBookUsers(data.bookUsers);
+                } else {
+                    showNotification('Error loading users', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error loading book users:', error);
                 showNotification('Error loading users', 'error');
             });
         }
@@ -1654,7 +1644,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error adding user:', error);
                 showNotification('Error adding user', 'error');
             })
             .finally(() => {
@@ -1683,7 +1672,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error updating role:', error);
                 showNotification('Error updating role', 'error');
                 loadBookUsers(); // Reload to reset the select
             });
@@ -1711,7 +1699,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error removing user:', error);
                 showNotification('Error removing user', 'error');
             });
         }

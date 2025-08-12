@@ -388,8 +388,8 @@ class BookController extends Controller
 
         // Check if user has owner or admin role
         $user = $request->user();
-        $role = $user->businesses()->where('business_id', $business->id)->value('role');
-        if (!in_array($role, ['owner', 'admin'])) {
+        $role = $user->getBookRole($book);
+        if ($role !== 'manager') {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
@@ -413,6 +413,8 @@ class BookController extends Controller
                 $query->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%");
             })
+            ->whereNotIn('id', $bookUserIds)
+            ->where('id', '!=', $request->user()->id) // Exclude current user
             ->limit(10)
             ->get(['id', 'name', 'email']);
 

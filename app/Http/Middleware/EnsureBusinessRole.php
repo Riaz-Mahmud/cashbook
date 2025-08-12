@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureBusinessRole
@@ -15,11 +16,20 @@ class EnsureBusinessRole
     {
         $user = $request->user();
         $business = $request->attributes->get('activeBusiness');
-        if (!$user || !$business) {
+        $book = $request->route('book');
+        if (!$user || !$business || !$book) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
             abort(403);
         }
-        $role = $user->businesses()->where('business_id', $business->id)->value('role');
+        $role = $book ? $user->getBookRole($book) : $user->businesses()
+                ->where('business_id', $business->id)
+                ->value('role');
         if (!$role || (!empty($roles) && !in_array($role, $roles))) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
             abort(403);
         }
         return $next($request);
