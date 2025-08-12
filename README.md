@@ -68,3 +68,10 @@ CashBook is licensed under the [MIT License](https://opensource.org/license/mit/
 - [Laravel](https://laravel.com) for the powerful PHP framework
 - [Vue.js](https://vuejs.org) for the modern JavaScript framework
 - [Bootstrap](https://getbootstrap.com) for the responsive design
+
+## Screenshot
+<img width="1902" height="1328" alt="Image" src="https://github.com/user-attachments/assets/1d503947-6c5b-4904-a58f-162a020617da" />
+<img width="1902" height="1044" alt="Image" src="https://github.com/user-attachments/assets/4036e8ce-55a6-4894-86b1-497dba90bd77" />
+<img width="1902" height="1044" alt="Image" src="https://github.com/user-attachments/assets/967509e8-5127-47b4-9c9e-443f2f7d8d4e" />
+<img width="1920" height="917" alt="Image" src="https://github.com/user-attachments/assets/f60402bc-5337-4534-9a0e-cebecf65f0a7" />
+<img width="1920" height="917" alt="Image" src="https://github.com/user-attachments/assets/063a9c74-800b-4697-a7b0-eaf3af1ce563" />
