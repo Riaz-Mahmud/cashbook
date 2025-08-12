@@ -56,10 +56,6 @@
         <!-- Top Navigation -->
         <header class="app-header">
             <div class="header-content">
-                <!-- Mobile Sidebar Toggle Button -->
-                <button class="mobile-sidebar-toggle" @click="sidebarOpen = true">
-                    ⋮
-                </button>
                 <!-- Left: Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('dashboard') }}" class="app-logo-link">
