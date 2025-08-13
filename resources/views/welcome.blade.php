@@ -41,6 +41,7 @@
                 @else
                     <a href="{{ route('register') }}" style="padding:12px 24px; background:#16a34a; color:white; border-radius:8px; text-decoration:none;">Create Free Account</a>
                     <a href="{{ route('login') }}" style="padding:12px 24px; border:1px solid #d1d5db; border-radius:8px; text-decoration:none; color:#374151; background:white;">Sign In</a>
+                    <a href="{{ route('login', ['demo' => true]) }}" style="padding:12px 24px; border:1px solid #d1d5db; border-radius:8px; text-decoration:none; color:#374151; background:white;">View Demo</a>
                 @endauth
             </div>
         </div>

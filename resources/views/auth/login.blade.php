@@ -2,13 +2,17 @@
     <!-- Session Status -->
     <x-auth-session-status class="alert alert-success" :status="session('status')" />
 
+    @php
+        $isDemo = request()->query('demo') == 1;
+    @endphp
+
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <!-- Email Address -->
         <div class="form-group">
             <label for="email" class="form-label">{{ __('Email') }}</label>
-            <input id="email" class="form-input" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" />
+            <input id="email" class="form-input" type="email" name="email" value="{{ $isDemo ? 'demo@cashbook.test' : old('email') }}" required autofocus autocomplete="username" />
             @if($errors->get('email'))
                 <div class="form-error">{{ implode(', ', $errors->get('email')) }}</div>
             @endif
@@ -17,7 +21,7 @@
         <!-- Password -->
         <div class="form-group">
             <label for="password" class="form-label">{{ __('Password') }}</label>
-            <input id="password" class="form-input" type="password" name="password" required autocomplete="current-password" />
+            <input id="password" class="form-input" type="password" name="password" value="{{ $isDemo ? 'Password' : '' }}" required autocomplete="current-password" />
             @if($errors->get('password'))
                 <div class="form-error">{{ implode(', ', $errors->get('password')) }}</div>
             @endif
