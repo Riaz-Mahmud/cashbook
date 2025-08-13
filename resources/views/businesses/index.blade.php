@@ -1,10 +1,10 @@
 <x-app-layout>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem;">
+        <div style="flex: 1 1 250px;">
             <h1 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.25rem;">Businesses</h1>
             <p style="font-size: 1rem; color: #6b7280; margin: 0;">Manage your business entities and switch between them.</p>
         </div>
-        <a href="{{ route('businesses.create') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; background-color: #4f46e5; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; cursor: pointer;">
+        <a href="{{ route('businesses.create') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; background-color: #4f46e5; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; cursor: pointer; white-space: nowrap;">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -13,12 +13,12 @@
     </div>
 
     @if($businesses->count() > 0)
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
             @foreach($businesses as $business)
-                <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 2px solid {{ auth()->user()->current_business_id == $business->id ? '#4f46e5' : 'transparent' }};">
+                <div style="flex: 1 1 calc(33.333% - 1rem); min-width: 280px; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 2px solid {{ auth()->user()->current_business_id == $business->id ? '#4f46e5' : 'transparent' }}; box-sizing: border-box;">
                     <div style="padding: 1.5rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                 <div style="color: #4f46e5; flex-shrink: 0;">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 36px; height: 36px;">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-6 4h3"></path>
@@ -26,12 +26,11 @@
                                 </div>
                                 <div>
                                     <h3 style="font-weight: 700; font-size: 1.25rem; color: #111827; margin: 0 0 0.25rem;">{{ $business->name }}</h3>
-                                    @if(auth()->user()->current_business_id == $business->id)
+                                    @if(Session::get('active_business_id') == $business->id)
                                         <span style="display: inline-block; background-color: #10b981; color: white; font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.5rem; border-radius: 0.25rem; letter-spacing: 0.05em;">Active</span>
                                     @endif
                                 </div>
                             </div>
-
                             <div style="position: relative;" x-data="{ open: false }">
                                 <button @click="open = !open" type="button" style="background: transparent; border: none; padding: 0.25rem; color: #9ca3af; cursor: pointer;">
                                     <svg fill="currentColor" viewBox="0 0 20 20" style="width: 20px; height: 20px;">
@@ -103,7 +102,7 @@
                         </div>
 
                         <div style="padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; color: #4b5563;">
+                            <div style="display: flex; justify-content: space-around; text-align: center; color: #4b5563;">
                                 <div>
                                     <div style="font-size: 1.5rem; font-weight: 700; color: #111827;">{{ count($business->books) ?? 0 }}</div>
                                     <div style="font-size: 0.75rem;">Books</div>

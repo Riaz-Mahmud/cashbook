@@ -17,18 +17,16 @@ class EnsureBusinessRole
         $user = $request->user();
         $business = $request->attributes->get('activeBusiness');
         $book = $request->route('book');
-        if (!$user || !$business || !$book) {
+        if (!$user || !$business || (!$book && empty($roles))) {
             if ($request->expectsJson()) {
-                return response()->json(['error' => 'Forbidden'], 403);
+                return response()->json(['message' => 'Forbidden 1'], 403);
             }
             abort(403);
         }
-        $role = $book ? $user->getBookRole($book) : $user->businesses()
-                ->where('business_id', $business->id)
-                ->value('role');
+        $role = $book ? $user->getBookRole($book) : $user->businesses()->where('business_id', $business->id)->value('role');
         if (!$role || (!empty($roles) && !in_array($role, $roles))) {
             if ($request->expectsJson()) {
-                return response()->json(['error' => 'Forbidden'], 403);
+                return response()->json(['message' => 'Forbidden 1'], 403);
             }
             abort(403);
         }

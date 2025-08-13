@@ -68,7 +68,7 @@
                 <div class="flex items-center">
                     @if($activeBusiness ?? null)
                         <div class="dropdown" x-data="{ open: false }">
-                            <button @click="open = !open" class="btn btn-secondary">
+                            <button @click="open = !open" class="btn btn-secondary" style="display: flex; align-items: center;">
                                 <div style="width: 8px; height: 8px; background: var(--success-color); border-radius: 50%; margin-right: 8px;"></div>
                                 <span>{{ $activeBusiness->name }}</span>
                                 <svg style="width: 16px; height: 16px; margin-left: 8px;" fill="currentColor" viewBox="0 0 20 20">
@@ -76,11 +76,12 @@
                                 </svg>
                             </button>
                             <div x-show="open" @click.away="open = false" x-transition class="dropdown-menu slide-down" style="min-width: 250px; left: 50%; transform: translateX(-50%);">
+
                                 @foreach(Auth::user()->businesses as $business)
                                     <form method="POST" action="{{ route('business.switch', $business) }}">
                                         @csrf
-                                        <button type="submit" class="dropdown-item {{ $business->id === $activeBusiness->id ? 'bg-gray-50' : '' }}">
-                                            <div class="flex items-center">
+                                        <button type="submit" class="dropdown-item {{ $business->id === $activeBusiness->id ? 'bg-gray-50' : '' }}" style="width: 100%; text-align: left; padding: 0.5rem 1rem;">
+                                            <div style="display: flex; align-items: center;">
                                                 <div style="width: 8px; height: 8px; background: {{ $business->id === $activeBusiness->id ? 'var(--primary-color)' : 'var(--gray-400)' }}; border-radius: 50%; margin-right: 12px;"></div>
                                                 <div>
                                                     <div>{{ $business->name }}</div>
@@ -90,9 +91,17 @@
                                         </button>
                                     </form>
                                 @endforeach
+
                                 <div class="dropdown-divider"></div>
-                                <a href="{{ route('businesses.create') }}" class="dropdown-item" style="color: var(--primary-color);">
-                                    + New Business
+
+                                <!-- View Current Business Button -->
+                                <a href="{{ route('businesses.index') }}" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; color: var(--primary-color); font-weight: 500;">
+                                    👁 View Businesses
+                                </a>
+
+                                <!-- Create New Business Button -->
+                                <a href="{{ route('businesses.create') }}" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; color: var(--primary-color);">
+                                    ➕ New Business
                                 </a>
                             </div>
                         </div>
@@ -121,6 +130,7 @@
                                 <div style="font-size: 0.75rem; color: var(--gray-500);">{{ Auth::user()->email }}</div>
                             </div>
                             <a href="{{ route('dashboard') }}" class="dropdown-item">Dashboard</a>
+                            <a href="{{ route('businesses.index') }}" class="dropdown-item">Businesses</a>
                             <a href="{{ route('profile.edit') }}" class="dropdown-item">Profile</a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
@@ -259,23 +269,32 @@
         </div>
 
         <!-- Footer -->
-        <footer class="app-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem;">
-            <div class="footer-left" style="font-size: 0.75rem; color: var(--gray-500);">
-                &copy; {{ date('Y') }} CashBook. All rights reserved.
-                <div class="footer-center" style="font-size: 0.65rem; color: var(--gray-400);">
+        <footer class="app-footer"
+            style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; padding: 1rem; border-top: 1px solid #e5e7eb; background-color: #f9fafb; font-family: sans-serif;">
+
+            <!-- Left Section -->
+            <div class="footer-left" style="font-size: 0.75rem; color: #6b7280;">
+                &copy; {{ date('Y') }} <strong style="color:#111827;">CashBook</strong>. All rights reserved.
+                <div class="footer-center" style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">
                     - Riaz
                 </div>
             </div>
-            <div class="footer-right" style="display: flex; align-items: center; gap: 1rem;">
-                <span>Version 1.0.0</span>
-                <a href="https://github.com/Riaz-Mahmud/cashbook" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.835 2.807 1.305 3.492.997.108-.775.418-1.305.76-1.605-2.665-.303-5.467-1.333-5.467-5.933 0-1.31.468-2.38 1.236-3.22-.124-.303-.536-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.5 11.5 0 013.003-.404c1.018.005 2.044.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.655 1.653.243 2.873.12 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.627-5.48 5.922.43.372.823 1.103.823 2.222v3.293c0 .319.217.694.825.576C20.565 21.796 24 17.298 24 12c0-6.627-5.373-12-12-12z"/>
-                </svg>
-                <span>GitHub Repo</span>
+
+            <!-- Right Section -->
+            <div class="footer-right" style="display: flex; align-items: center; gap: 1rem; font-size: 0.75rem; color: #4b5563;">
+                <span style="white-space: nowrap;">Version 1.0.0</span>
+
+                <a href="https://github.com/Riaz-Mahmud/cashbook" target="_blank" rel="noopener noreferrer"
+                    style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.6rem; background-color: #111827; color: white; border-radius: 0.25rem; text-decoration: none; font-size: 0.75rem; transition: background-color 0.2s;">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.835 2.807 1.305 3.492.997.108-.775.418-1.305.76-1.605-2.665-.303-5.467-1.333-5.467-5.933 0-1.31.468-2.38 1.236-3.22-.124-.303-.536-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.5 11.5 0 013.003-.404c1.018.005 2.044.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.655 1.653.243 2.873.12 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.627-5.48 5.922.43.372.823 1.103.823 2.222v3.293c0 .319.217.694.825.576C20.565 21.796 24 17.298 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span style="white-space: nowrap;">GitHub</span>
                 </a>
             </div>
         </footer>
+
 
     </body>
 </html>
