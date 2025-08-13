@@ -11,42 +11,51 @@
             </a>
             <div class="page-header-title-group">
                 <h1 class="page-title">{{ $book->name }}</h1>
-                <a href="{{ route('books.edit', $book) }}" class="page-header-icon-btn" title="Edit Book Settings">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                </a>
-                <button @click="$dispatch('open-modal', 'manage-users')" class="page-header-icon-btn" title="Manage Users">
-                    <svg height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                        viewBox="0 0 60.671 60.671" xml:space="preserve">
-                    <g>
+
+                @php
+                    $userRole = Auth::user()->books()->where('book_id', $book->id)->first()->pivot->role ?? 'viewer';
+                @endphp
+                @if(in_array($userRole, ['manager']))
+                    <a href="{{ route('books.edit', $book) }}" class="page-header-icon-btn" title="Edit Book Settings">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </a>
+
+                    <button @click="$dispatch('open-modal', 'manage-users')" class="page-header-icon-btn" title="Manage Users">
+                        <svg height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            viewBox="0 0 60.671 60.671" xml:space="preserve">
                         <g>
-                            <ellipse style="fill:#010002;" cx="30.336" cy="12.097" rx="11.997" ry="12.097"/>
-                            <path style="fill:#010002;" d="M35.64,30.079H25.031c-7.021,0-12.714,5.739-12.714,12.821v17.771h36.037V42.9
-                                C48.354,35.818,42.661,30.079,35.64,30.079z"/>
+                            <g>
+                                <ellipse style="fill:#010002;" cx="30.336" cy="12.097" rx="11.997" ry="12.097"/>
+                                <path style="fill:#010002;" d="M35.64,30.079H25.031c-7.021,0-12.714,5.739-12.714,12.821v17.771h36.037V42.9
+                                    C48.354,35.818,42.661,30.079,35.64,30.079z"/>
+                            </g>
                         </g>
-                    </g>
-                    </svg>
-                </button>
+                        </svg>
+                    </button>
+                @endif
             </div>
         </div>
 
         <!-- Right side: Action Buttons -->
-        <div class="page-header-right">
-            <a href="{{ route('transactions.import.create', $book) }}" class="btn btn-secondary">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Add Bulk Entries
-            </a>
-            <a href="{{ route('reports.index', $book) }}" class="btn btn-secondary">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                Reports
-            </a>
-        </div>
+        @if ($bookRole !== 'viewer')
+            <div class="page-header-right">
+                <a href="{{ route('transactions.import.create', $book) }}" class="btn btn-secondary">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Bulk Entries
+                </a>
+                <a href="{{ route('reports.index', $book) }}" class="btn btn-secondary">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Reports
+                </a>
+            </div>
+        @endif
 
     </div>
 
@@ -213,9 +222,9 @@
             </button>
             @endif
             @php
-                $userRole = auth()->user()->businesses()->where('business_id', $activeBusiness->id)->value('role');
+                $userRole = $user->books()->where('book_id', $book->id)->first()->pivot->role ?? 'viewer';
             @endphp
-            @if(in_array($userRole, ['owner', 'admin']))
+            @if(in_array($userRole, ['manager']))
             <button @click="$dispatch('open-modal', 'manage-users')" class="btn btn-secondary">
                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
@@ -333,12 +342,14 @@
             <!-- Sticky Action Buttons -->
             <div class="modal-footer">
                 <div class="detail-actions">
-                    <button id="edit-transaction-btn" class="btn btn-primary" onclick="editTransactionFromDetail()">
-                        Edit Transaction
-                    </button>
-                    <button id="delete-transaction-btn" class="btn btn-danger" onclick="deleteTransactionFromDetail()">
-                        Delete Transaction
-                    </button>
+                    @if($bookRole !== 'viewer')
+                        <button id="edit-transaction-btn" class="btn btn-primary" onclick="editTransactionFromDetail()">
+                            Edit Transaction
+                        </button>
+                        <button id="delete-transaction-btn" class="btn btn-danger" onclick="deleteTransactionFromDetail()">
+                            Delete Transaction
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -875,8 +886,29 @@
             populateActivityTimeline(activities);
 
             // Action buttons
-            document.getElementById('edit-transaction-btn').onclick = () => editTransactionFromDetail();
-            document.getElementById('delete-transaction-btn').onclick = () => deleteTransactionFromDetail();
+            const bookRole = '<?php echo $bookRole; ?>';
+
+            // Only show buttons for non-viewers
+            if (bookRole !== 'viewer') {
+                document.getElementById('edit-transaction-btn').style.display = 'inline-block';
+                document.getElementById('delete-transaction-btn').style.display = 'inline-block';
+                // Editors can only edit/delete if they created the transaction
+                if (bookRole === 'editor') {
+                    if (transaction.user.id === {{ auth()->id() }}) {
+                        document.getElementById('edit-transaction-btn').onclick = () => editTransactionFromDetail();
+                        document.getElementById('delete-transaction-btn').onclick = () => deleteTransactionFromDetail();
+                    } else {
+                        // Hide buttons if editor didn't create it
+                        document.getElementById('edit-transaction-btn').style.display = 'none';
+                        document.getElementById('delete-transaction-btn').style.display = 'none';
+                    }
+                } else {
+                    // Other roles can always edit/delete
+                    document.getElementById('edit-transaction-btn').onclick = () => editTransactionFromDetail();
+                    document.getElementById('delete-transaction-btn').onclick = () => deleteTransactionFromDetail();
+                }
+            }
+
         }
 
         // Populate activity timeline

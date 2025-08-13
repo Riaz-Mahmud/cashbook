@@ -109,6 +109,16 @@ class User extends Authenticatable
         return $this->getBookRole($book) === 'manager';
     }
 
+    public function getUserBookRole(Book $book): ?string
+    {
+        // get the user
+        $user = $this->books()->where('book_id', $book->id)->first();
+        $bookRole = $user ? $user->pivot->role : null;
+
+        return $bookRole;
+
+    }
+
     public function accessibleBooks(Business $business)
     {
         // If user is owner/admin, return all books

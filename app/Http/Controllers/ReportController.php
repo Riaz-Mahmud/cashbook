@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TransactionsExport;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -81,15 +82,14 @@ class ReportController extends Controller
         ];
 
         if ($request->format === 'pdf') {
-            $pdf = app('dompdf.wrapper');
-            $pdf->loadView('reports.exports.pdf', $viewData);
-            return $pdf->download($fileName);
+            $pdf = Pdf::loadView('reports.exports.pdf', $viewData);
+            return $pdf->stream($fileName);
         }
 
         if ($request->format === 'csv') {
             // We use a Blade view for CSV as well for consistency
             $headers = [
-                'Content-type'        => 'text/csv',
+                'Content-Type'        => 'text/csv; charset=UTF-8',
                 'Content-Disposition' => 'attachment; filename=' . $fileName,
             ];
             return response()->make(view('reports.exports.csv', $viewData), 200, $headers);

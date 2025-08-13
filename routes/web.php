@@ -58,11 +58,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/books/{book}/reports', [ReportController::class, 'generate'])->name('reports.generate');
     Route::get('/books/{book}/reports/download', [ReportController::class, 'download'])->name('reports.download');
 
-    Route::resource('recurring-transactions', \App\Http\Controllers\RecurringTransactionController::class)->except(['show']);
-    Route::get('budgets', [\App\Http\Controllers\BudgetController::class, 'index'])->name('budgets.index');
-    Route::post('budgets', [\App\Http\Controllers\BudgetController::class, 'store'])->name('budgets.store');
-    Route::delete('budgets/{budget}', [\App\Http\Controllers\BudgetController::class, 'destroy'])->name('budgets.destroy');
-
     Route::middleware('business.role:owner,admin')->group(function(){
         Route::get('settings', [\App\Http\Controllers\TeamController::class, 'index'])->name('settings.index');
         Route::post('settings/business', [\App\Http\Controllers\TeamController::class, 'updateBusiness'])->name('settings.business.update');

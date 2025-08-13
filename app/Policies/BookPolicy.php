@@ -12,21 +12,10 @@ class BookPolicy
      */
     public function view(User $user, Book $book): bool
     {
-        // Owner, Admin, or Manager have full view rights
-        if ($user->canManageBook($book)) {
-            return true;
-        }
-
         $role = $user->getBookRole($book);
 
-        // Staff can view only if directly assigned to the book
-        if ($role === 'staff') {
-            return $user->books()
-                ->where('books.id', $book->id)
-                ->exists();
-        }
-
-        return false;
+        // Managers, editors, viewers can view
+        return in_array($role, ['manager', 'editor', 'viewer']);
     }
 
     /**
@@ -35,7 +24,7 @@ class BookPolicy
     public function update(User $user, Book $book): bool
     {
         // Manager role can update (includes owner/admin)
-        return $user->getBookRole($book);
+        return $user->canManageBook($book);
     }
 
     /**

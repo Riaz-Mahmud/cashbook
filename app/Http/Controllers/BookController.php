@@ -95,6 +95,7 @@ class BookController extends Controller
         // Ensure the book belongs to the active business and the user can view it
         $business = $request->attributes->get('activeBusiness');
         $user = $request->user();
+        $user->getUserBookRole($book); // Ensure the user has a role in the book
 
         abort_unless($book->business_id === $business->id, 404);
         $this->authorize('view', $book);

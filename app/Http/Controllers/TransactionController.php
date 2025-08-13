@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
 use App\Models\Book;
 use App\Models\Business;
 use App\Models\Category;
+use App\Models\ActivityLog;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Notifications\TransactionApproved;
 use App\Notifications\TransactionRejected;
 use App\Notifications\TransactionSubmitted;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class TransactionController extends Controller
 {
@@ -206,22 +207,35 @@ class TransactionController extends Controller
         $user = $request->user();
         $businessRole = $user->businesses()->where('business_id', $business->id)->value('role');
 
-        // Check book-level permissions
         if (in_array($businessRole, ['owner', 'admin'])) {
-            // Business owners and admins can edit any transaction
             $canEdit = true;
         } else {
-            // For staff, check their role in the specific book
             $bookUser = $user->books()->where('books.id', $transaction->book_id)->first();
-
             if (!$bookUser) {
+                Log::info('Book Not Found');
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You do not have access to this book'
+                    ], 403);
+                }
                 abort(403, 'You do not have access to this book');
             }
 
             $bookRole = $bookUser->pivot->role;
 
-            // Only manager and editor can edit, and only their own transactions
-            $canEdit = in_array($bookRole, ['manager', 'editor']) && $transaction->user_id === $user->id;
+            // Correct combined logic
+            $canEdit = in_array($bookRole, ['manager']) || ($bookRole === 'editor' && $transaction->user_id === $user->id);
+
+            if (!$canEdit) {
+                Log::info('User does not have permission to edit this transaction', [
+                    'user_id' => $user->id,
+                    'transaction_id' => $transaction->id,
+                    'book_id' => $transaction->book_id,
+                    'book_role' => $bookRole,
+                    'business_id' => $business->id
+                ]);
+            }
         }
 
         abort_unless($canEdit, 403);
@@ -271,7 +285,7 @@ class TransactionController extends Controller
             $bookRole = $bookUser->pivot->role;
 
             // Only manager and editor can edit, and only their own transactions
-            $canEdit = in_array($bookRole, ['manager', 'editor']) && $transaction->user_id === $user->id;
+            $canEdit = in_array($bookRole, ['manager']) || ($bookRole === 'editor' && $transaction->user_id === $user->id);
         }
 
         abort_unless($canEdit, 403);
@@ -355,7 +369,7 @@ class TransactionController extends Controller
             $bookRole = $bookUser->pivot->role;
 
             // Only manager and editor can delete, and only their own transactions
-            $canDelete = in_array($bookRole, ['manager', 'editor']) && $transaction->user_id === $user->id;
+            $canDelete = in_array($bookRole, ['manager']) || ($bookRole === 'editor' && $transaction->user_id === $user->id);
         }
 
         abort_unless($canDelete, 403);
@@ -422,7 +436,7 @@ class TransactionController extends Controller
                 $bookUser = $user->books()->where('books.id', $transaction->book_id)->first();
                 if ($bookUser) {
                     $bookRole = $bookUser->pivot->role;
-                    if (in_array($bookRole, ['manager', 'editor']) && $transaction->user_id === $user->id) {
+                    if (in_array($bookRole, ['manager']) || ($bookRole === 'editor' && $transaction->user_id === $user->id)) {
                         $canDelete = true;
                     }
                 }
