@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/{book}/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/books/{book}/reports', [ReportController::class, 'generate'])->name('reports.generate');
     Route::get('/books/{book}/reports/download', [ReportController::class, 'download'])->name('reports.download');
+    Route::delete('settings/leave', [\App\Http\Controllers\TeamController::class, 'leave'])->name('settings.leave');
 
     Route::middleware('business.role:owner,admin')->group(function(){
         Route::get('settings', [\App\Http\Controllers\TeamController::class, 'index'])->name('settings.index');

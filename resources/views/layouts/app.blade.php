@@ -134,6 +134,7 @@
                             </div>
                             <a href="{{ route('dashboard') }}" class="dropdown-item">Dashboard</a>
                             <a href="{{ route('businesses.index') }}" class="dropdown-item">Businesses</a>
+                            <a href="{{ route('settings.index', $activeBusiness) }}" class="dropdown-item">Settings</a>
                             <a href="{{ route('profile.edit') }}" class="dropdown-item">Profile</a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
@@ -156,70 +157,7 @@
                     :class="{ 'open': sidebarOpen }"
                     @click.away="sidebarOpen = false">
                     <div class="sidebar-section">
-                        @if (Route::currentRouteName() === 'dashboard')
-                            <h2 class="sidebar-title">Dashboard</h2>
-                            {{-- show user name and image and show profile link --}}
-                            <nav class="sidebar-nav">
-                                <div class="flex items-center" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <div class="avatar" style="width: 32px; height: 32px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
-                                        <span style="color: white; font-weight: 500; font-size: 0.875rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
-                                    </div>
-                                    <span>{{ Auth::user()->name }}</span>
-                                </div>
-
-                                <a href="{{ route('dashboard') }}" class="nav-link active" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <!-- Home / Dashboard Icon -->
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9v9a3 3 0 01-3 3h-3a3 3 0 01-3-3v-6H6a3 3 0 00-3 3v3z"/>
-                                    </svg>
-                                    <span>Dashboard</span>
-                                </a>
-
-                                <a href="{{ route('businesses.index') }}" class="nav-link" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <!-- Briefcase / Businesses Icon -->
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></rect>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7V5a4 4 0 00-8 0v2"></path>
-                                    </svg>
-                                    <span>Businesses</span>
-                                </a>
-
-                                <a href="{{ route('profile.edit') }}" class="nav-link" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <!-- User / Profile Icon -->
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 21a6.5 6.5 0 0113 0"></path>
-                                    </svg>
-                                    <span>Profile</span>
-                                </a>
-
-                                <a href="{{ route('settings.index', $activeBusiness) }}" class="nav-link" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <!-- Users / Team Icon -->
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21v-2a4 4 0 00-8 0v2m8-10a4 4 0 11-8 0 4 4 0 018 0zM12 7a4 4 0 100-8 4 4 0 000 8z"></path>
-                                    </svg>
-                                    <span>Settings</span>
-                                </a>
-
-                                {{-- sign out --}}
-                                <form method="POST" action="{{ route('logout') }}" class="mt-4">
-                                    @csrf
-                                    <button
-                                        type="submit"
-                                        class="nav-link"
-                                        style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--danger-color); cursor: pointer;"
-                                        onclick="return confirm('Are you sure you want to sign out?')"
-                                    >
-                                        <!-- Sign Out Icon -->
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6-8V3a2 2 0 00-2-2H5a2 2 0 00-2 2v18a2 2 0 002 2h10a2 2 0 002-2v-3"></path>
-                                        </svg>
-                                        <span>Sign Out</span>
-                                    </button>
-                                </form>
-
-                            </nav>
-                        @else
+                        @if (Route::is('books.*') || Route::is('transactions.*') || Route::is('reports.*'))
                             <div class="flex items-center justify-between mb-4">
                                 <h2 class="sidebar-title">Books</h2>
                                 @php
@@ -267,6 +205,69 @@
                                         @endif
                                     </div>
                                 @endforelse
+                            </nav>
+                        @else
+                        <h2 class="sidebar-title">Dashboard</h2>
+                            {{-- show user name and image and show profile link --}}
+                            <nav class="sidebar-nav">
+                                <div class="flex items-center" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <div class="avatar" style="width: 32px; height: 32px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                                        <span style="color: white; font-weight: 500; font-size: 0.875rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                                    </div>
+                                    <span>{{ Auth::user()->name }}</span>
+                                </div>
+
+                                <a href="{{ route('dashboard') }}" class="nav-link {{ Route::is('dashboard.*') ? 'active' : '' }}"  style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- Home / Dashboard Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9v9a3 3 0 01-3 3h-3a3 3 0 01-3-3v-6H6a3 3 0 00-3 3v3z"/>
+                                    </svg>
+                                    <span>Dashboard</span>
+                                </a>
+
+                                <a href="{{ route('businesses.index') }}" class="nav-link {{ Route::is('businesses.*') ? 'active' : '' }}" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- Briefcase / Businesses Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></rect>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7V5a4 4 0 00-8 0v2"></path>
+                                    </svg>
+                                    <span>Businesses</span>
+                                </a>
+
+                                <a href="{{ route('profile.edit') }}" class="nav-link {{ Route::is('profile.*') ? 'active' : '' }}" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- User / Profile Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 21a6.5 6.5 0 0113 0"></path>
+                                    </svg>
+                                    <span>Profile</span>
+                                </a>
+
+                                <a href="{{ route('settings.index', $activeBusiness) }}" class="nav-link {{ Route::is('settings.*') ? 'active' : '' }}" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <!-- Users / Team Icon -->
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21v-2a4 4 0 00-8 0v2m8-10a4 4 0 11-8 0 4 4 0 018 0zM12 7a4 4 0 100-8 4 4 0 000 8z"></path>
+                                    </svg>
+                                    <span>Settings</span>
+                                </a>
+
+                                {{-- sign out --}}
+                                <form method="POST" action="{{ route('logout') }}" class="mt-4">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        class="nav-link"
+                                        style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--danger-color); cursor: pointer;"
+                                        onclick="return confirm('Are you sure you want to sign out?')"
+                                    >
+                                        <!-- Sign Out Icon -->
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6-8V3a2 2 0 00-2-2H5a2 2 0 00-2 2v18a2 2 0 002 2h10a2 2 0 002-2v-3"></path>
+                                        </svg>
+                                        <span>Sign Out</span>
+                                    </button>
+                                </form>
+
                             </nav>
                         @endif
                     </div>
