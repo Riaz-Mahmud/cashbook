@@ -270,12 +270,14 @@ body {
 }
 
 .card .card-body[style*="padding: 0"] .dataTables_wrapper {
-    padding: 1.5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
     padding-top: 1rem;
 }
 
 .card .card-body[style*="padding: 0"] .dataTables_wrapper .table {
-    margin: 0 -1.5rem;
     border-radius: 0;
     box-shadow: none;
     border: none;
@@ -1186,7 +1188,7 @@ body {
 
 /* Header Controls */
 .dataTables_wrapper .dataTables_length {
-    margin-bottom: 1.5rem;
+    padding: 1rem;
     float: none;
 }
 
@@ -1254,6 +1256,10 @@ body {
     margin-top: 1rem;
 }
 
+.table.dataTable{
+    margin-top: 0 !important;
+}
+
 /* Info Text Styling */
 .dataTables_wrapper .dataTables_info {
     font-size: 0.875rem;
@@ -1263,6 +1269,7 @@ body {
     float: none;
     display: inline-block;
     margin-right: 2rem;
+    margin-left: 2rem;
 }
 
 /* Pagination Container */

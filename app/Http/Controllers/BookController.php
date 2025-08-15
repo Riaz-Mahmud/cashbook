@@ -21,7 +21,7 @@ class BookController extends Controller
         if (in_array($role, ['owner', 'admin'])) {
             // Owners and admins can see all books with access information
             $allBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
-            $userBookIds = $user->books()->where('business_id', $business->id)->pluck('books.id')->toArray();
+            $userBookIds = Book::where('business_id', $business->id)->pluck('books.id')->toArray();
 
             $books = $allBooks->map(function($book) use ($userBookIds) {
                 $book->user_has_access = in_array($book->id, $userBookIds);
@@ -493,6 +493,14 @@ class BookController extends Controller
             ], 404);
         }
 
+        // if the user is the owner of the business, they cannot have their role changed
+        if ($user->businesses()->where('business_id', $business->id)->value('role') === 'owner') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot change role of business owner'
+            ], 403);
+        }
+
         $book->users()->updateExistingPivot($user->id, ['role' => $data['role']]);
 
         if ($request->ajax()) {
@@ -517,6 +525,14 @@ class BookController extends Controller
                 'success' => false,
                 'message' => 'User is not assigned to this book'
             ], 404);
+        }
+
+        // if the user is the owner of the business, they cannot be removed from the book
+        if ($user->businesses()->where('business_id', $business->id)->value('role') === 'owner') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot remove business owner from book'
+            ], 403);
         }
 
         $book->users()->detach($user->id);

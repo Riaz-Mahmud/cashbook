@@ -156,7 +156,7 @@
                         </svg>
                         <span style="font-weight: 600;">Cash In</span>
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;" id="summary-amount">
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;" class="summary-amount">
                         @php
                             // Get totals from all transactions, not just paginated ones
                             $allTransactions = $book->transactions;
@@ -248,7 +248,7 @@
 
     <!-- Transactions Table -->
     <div class="card">
-        <div class="card-body" style="padding: 0; overflow-x: auto; max-height: 70vh; overflow-y: auto;">
+        <div class="card-body" style="padding: 0">
             <table id="transactions-table" class="table" style="width: 100%;">
                 <thead>
                     <tr>
@@ -617,7 +617,6 @@
                     url: '{{ route("books.transactions.data", $book) }}',
                     type: 'GET',
                     data: function(d) {
-                        // Add filter parameters
                         d.duration = $('select:eq(0)').val();
                         d.type = $('select:eq(1)').val();
                         d.member = $('select:eq(2)').val();
@@ -629,7 +628,7 @@
                 columns: [
                     {
                         data: 'id', name: 'id', orderable: false, searchable: false,
-                        render: function (data, type, row) {
+                        render: function(data) {
                             return '<input type="checkbox" class="transaction-checkbox" value="' + data + '">';
                         }
                     },
@@ -646,24 +645,74 @@
                 order: [[0, 'desc']],
                 pageLength: 25,
                 responsive: false,
-                lengthMenu: [25, 50, 100],
+                lengthMenu: [10, 25, 50, 75, 100],
                 autoWidth: true,
+                scrollY: '80vh',
+                scrollCollapse: true,
+                scrollX: true,
+                fixedHeader: true,
                 language: {
                     processing: 'Loading transactions...',
                     emptyTable: 'No transactions found',
                     zeroRecords: 'No matching transactions found'
                 },
-                drawCallback: function() {
-                    // Add click listeners to table rows
-                    $('#transactions-table tbody tr').off('click').on('click', function(e) {
-                        // Don't trigger if clicking on action buttons
-                        if ($(e.target).closest('button, a').length === 0) {
-                            const data = dataTable.row(this).data();
-                            if (data && data.id) {
-                                showTransactionDetail(data.id);
-                            }
+                initComplete: function() {
+                    const api = this.api();
+
+                    // Row click (only once)
+                    $('#transactions-table tbody').on('click', 'tr', function(e) {
+                        const data = api.row(this).data();
+                        if (data && data.id) {
+                            showTransactionDetail(data.id);
                         }
                     });
+
+                    // Prevent checkbox clicks from triggering row click
+                    $('#transactions-table tbody').on('click', 'input[type="checkbox"]', function(e) {
+                        e.stopPropagation();
+                    });
+
+                    // Select All checkbox
+                    $('#select-all-checkbox').on('change', function() {
+                        const isChecked = this.checked;
+                        api.rows({ search: 'applied' }).nodes()
+                            .to$()
+                            .find('input[type="checkbox"]')
+                            .prop('checked', isChecked);
+                        updateSelectedCount();
+                    });
+
+                    // Individual checkbox change
+                    $('#transactions-table tbody').on('change', 'input[type="checkbox"]', function() {
+                        const selectAll = $('#select-all-checkbox').get(0);
+                        if (!this.checked && selectAll && selectAll.checked && ('indeterminate' in selectAll)) {
+                            selectAll.indeterminate = true;
+                        }
+                        updateSelectedCount();
+                    });
+
+                    // Filter events
+                    $('.card-body select').on('change', function() {
+                        api.ajax.reload();
+                        updateSummaryCards();
+                    });
+
+                    const searchInput = $('input[placeholder*="Search"]');
+                    if (searchInput.length) {
+                        searchInput.on('input', debounce(function() {
+                            api.ajax.reload();
+                        }, 300));
+                    }
+
+                    // Initial summary update
+                    updateSummaryCards();
+                },
+                preDrawCallback: function() {
+                    $('#selected-count').text('0');
+                    $('#bulk-delete-btn').hide();
+                },
+                drawCallback: function() {
+                    updateSelectedCount();
                 }
             });
 
