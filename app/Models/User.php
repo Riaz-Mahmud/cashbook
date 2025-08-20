@@ -83,12 +83,6 @@ class User extends Authenticatable
     // Book role helper methods
     public function getBookRole(Book $book): ?string
     {
-        // Check if user is business owner/admin (has manager access to all books)
-        $businessRole = $this->businesses()->where('business_id', $book->business_id)->value('role');
-        if (in_array($businessRole, ['owner', 'admin'])) {
-            return 'manager';
-        }
-
         // Check direct book role
         return $this->books()->where('book_id', $book->id)->value('role');
     }

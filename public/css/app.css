@@ -599,6 +599,7 @@ body {
     box-shadow: var(--shadow-lg);
     max-width: 500px;
     width: 90%;
+    height: 100dvh; /* modern browsers */
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -619,7 +620,11 @@ body {
 }
 
 .modal-footer {
-    padding: 1rem 1.5rem;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
     border-top: 1px solid var(--gray-200);
     display: flex;
     justify-content: flex-end;

@@ -18,17 +18,17 @@ class BookController extends Controller
         // Get user's role in the business
         $role = $user->businesses()->where('business_id', $business->id)->value('role');
 
-        if (in_array($role, ['owner', 'admin'])) {
-            // Owners and admins can see all books with access information
-            $allBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
-            $userBookIds = Book::where('business_id', $business->id)->pluck('books.id')->toArray();
+        // if (in_array($role, ['owner', 'admin'])) {
+        //     // Owners and admins can see all books with access information
+        //     $allBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
+        //     $userBookIds = Book::where('business_id', $business->id)->pluck('books.id')->toArray();
 
-            $books = $allBooks->map(function($book) use ($userBookIds) {
-                $book->user_has_access = in_array($book->id, $userBookIds);
-                $book->hashId = CommonHelper::encodeId($book->id);
-                return $book;
-            });
-        } else {
+        //     $books = $allBooks->map(function($book) use ($userBookIds) {
+        //         $book->user_has_access = in_array($book->id, $userBookIds);
+        //         $book->hashId = CommonHelper::encodeId($book->id);
+        //         return $book;
+        //     });
+        // } else {
             // Staff can only see books they are assigned to
             $assignedBookIds = $user->books()->where('business_id', $business->id)->pluck('books.id');
             $books = Book::where('business_id', $business->id)
@@ -41,7 +41,7 @@ class BookController extends Controller
                 $book->hashId = CommonHelper::encodeId($book->id);
                 return $book;
             });
-        }
+        // }
 
         return view('books.index', compact('books', 'role'));
     }
@@ -101,15 +101,18 @@ class BookController extends Controller
         $this->authorize('view', $book);
 
         // Get user's role in the business and book
-        $businessRole = $user->businesses()->where('business_id', $business->id)->value('role');
+        // $businessRole = $user->businesses()->where('business_id', $business->id)->value('role');
 
-        // Determine user's role for this specific book
-        if (in_array($businessRole, ['owner', 'admin'])) {
-            $bookRole = 'manager'; // Business owners/admins have manager-level access
-        } else {
-            $bookUser = $user->books()->where('books.id', $book->id)->first();
-            $bookRole = $bookUser ? $bookUser->pivot->role : null;
-        }
+        // // Determine user's role for this specific book
+        // if (in_array($businessRole, ['owner', 'admin'])) {
+        //     $bookRole = 'manager'; // Business owners/admins have manager-level access
+        // } else {
+        //     $bookUser = $user->books()->where('books.id', $book->id)->first();
+        //     $bookRole = $bookUser ? $bookUser->pivot->role : null;
+        // }
+
+        $bookUser = $user->books()->where('books.id', $book->id)->first();
+        $bookRole = $bookUser ? $bookUser->pivot->role : null;
 
         $transactions = $book->transactions()->with(['category','user'])
             ->orderByDesc('transaction_date')

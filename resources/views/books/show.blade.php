@@ -340,7 +340,16 @@
             </div>
 
             <!-- Sticky Action Buttons -->
-            <div class="modal-footer">
+            <div class="modal-footer" style="
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 0.75rem;
+                    border-top: 1px solid #ddd;
+                    padding: 1rem;
+                    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                    background: #fff;
+                    position: sticky;
+                    bottom: 0;">
                 <div class="detail-actions">
                     @if($bookRole !== 'viewer')
                         <button id="edit-transaction-btn" class="btn btn-primary" onclick="editTransactionFromDetail()">
@@ -391,7 +400,7 @@
 
                     <div class="form-group">
                         <label for="mode" class="form-label">Payment Mode</label>
-                        <input id="mode" name="mode" type="text" class="form-input" placeholder="Enter payment mode..." required />
+                        <input id="mode" name="mode" type="text" class="form-input" placeholder="Enter payment mode..." />
                         <x-input-error :messages="$errors->get('mode')" class="mt-2" />
                     </div>
                 </div>
@@ -426,7 +435,16 @@
                     <x-input-error :messages="$errors->get('receipt')" class="mt-2" />
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem;">
+                <div style="
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 0.75rem;
+                    border-top: 1px solid #ddd;
+                    padding: 1rem;
+                    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                    background: #fff;
+                    position: sticky;
+                    bottom: 0;">
                     <button type="button" @click="$dispatch('close-modal', 'add-transaction')" class="btn btn-secondary">
                         Cancel
                     </button>
@@ -471,7 +489,7 @@
 
                     <div class="form-group">
                         <label for="edit_mode" class="form-label">Payment Mode</label>
-                        <input id="edit_mode" name="mode" type="text" class="form-input" required />
+                        <input id="edit_mode" name="mode" type="text" class="form-input" placeholder="Enter payment mode..." />
                     </div>
                 </div>
 
@@ -505,7 +523,16 @@
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem;">
+                <div style="
+                        display: flex;
+                        justify-content: flex-end;
+                        gap: 0.75rem;
+                        border-top: 1px solid #ddd;
+                        padding: 1rem;
+                        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                        background: #fff;
+                        position: sticky;
+                        bottom: 0;">
                     <button type="button" @click="$dispatch('close-modal', 'edit-transaction')" class="btn btn-secondary">
                         Cancel
                     </button>

@@ -37,18 +37,18 @@ class DashboardController extends Controller
         // Get user's role in the business
         $role = $user->businesses()->where('business_id', $business->id)->value('role');
 
-        // Determine which books the user can access
-        if (in_array($role, ['owner', 'admin'])) {
-            // Owners and admins can see all business data
-            $accessibleBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
-            $accessibleBookIds = $accessibleBooks->pluck('id');
-            $hasAccess = true;
-        } else {
+        // // Determine which books the user can access
+        // if (in_array($role, ['owner', 'admin'])) {
+        //     // Owners and admins can see all business data
+        //     $accessibleBooks = Book::where('business_id', $business->id)->latest('updated_at')->get();
+        //     $accessibleBookIds = $accessibleBooks->pluck('id');
+        //     $hasAccess = true;
+        // } else {
             // Staff can only see data from books they are assigned to
             $accessibleBooks = $user->books()->where('business_id', $business->id)->get();
             $accessibleBookIds = $accessibleBooks->pluck('id');
             $hasAccess = $accessibleBookIds->isNotEmpty();
-        }
+        // }
 
         // If user has no access to any books, show empty dashboard
         if (!$hasAccess) {

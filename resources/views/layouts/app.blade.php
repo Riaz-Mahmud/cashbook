@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'CashBook') }}</title>
@@ -54,6 +54,8 @@
                 align-items: center;
             }
         </style>
+
+        @livewireStyles
     </head>
     <body class="app-layout" x-data="{ sidebarOpen: false }">
         <!-- Top Navigation -->
@@ -134,6 +136,13 @@
                             </div>
                             <a href="{{ route('dashboard') }}" class="dropdown-item">Dashboard</a>
                             <a href="{{ route('businesses.index') }}" class="dropdown-item">Businesses</a>
+                            <a href="{{ route('notifications.index') }}" class="dropdown-item">Notifications
+                                @if(Auth::user()->unreadNotifications->count() > 0)
+                                    <span class="badge" style="background: var(--danger-color); color: white; padding: 0.25rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">
+                                        {{ Auth::user()->unreadNotifications->count() }}
+                                    </span>
+                                @endif
+                            </a>
                             <a href="{{ route('settings.index', $activeBusiness) }}" class="dropdown-item">Settings</a>
                             <a href="{{ route('profile.edit') }}" class="dropdown-item">Profile</a>
                             <div class="dropdown-divider"></div>
@@ -176,20 +185,21 @@
                                     $user = Auth::user();
                                     $role = $user->businesses()->where('business_id', $activeBusiness->id)->value('role');
 
-                                    if (in_array($role, ['owner', 'admin'])) {
-                                        // Owners and admins can see all books
-                                        $books = \App\Models\Book::where('business_id', $activeBusiness->id)->latest('updated_at')->get();
-                                    } else {
-                                        // Staff can only see books they are assigned to
-                                        $assignedBookIds = $user->books()->where('business_id', $activeBusiness->id)->pluck('books.id');
-                                        $books = \App\Models\Book::where('business_id', $activeBusiness->id)
-                                                    ->whereIn('id', $assignedBookIds)
-                                                    ->latest('updated_at')
-                                                    ->get();
-                                    }
+                                    // Staff can only see books they are assigned to
+                                    $assignedBookIds = $user->books()->where('business_id', $activeBusiness->id)->pluck('books.id');
+                                    $books = \App\Models\Book::where('business_id', $activeBusiness->id)
+                                                ->whereIn('id', $assignedBookIds)
+                                                ->latest('updated_at')
+                                                ->get();
 
                                     $selectedBookId = request()->route('book')?->id ?? request()->get('book');
                                 @endphp
+
+                                @if(!in_array($role, ['viewer']))
+                                <a href="{{ route('books.create') }}" class="nav-link" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    Create Book
+                                </a>
+                                @endif
 
                                 @forelse($books as $book)
                                     <a href="{{ route('books.show', $book) }}" class="nav-link {{ $selectedBookId == $book->id ? 'active' : '' }}" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -217,7 +227,7 @@
                                     <span>{{ Auth::user()->name }}</span>
                                 </div>
 
-                                <a href="{{ route('dashboard') }}" class="nav-link {{ Route::is('dashboard.*') ? 'active' : '' }}"  style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <a href="{{ route('dashboard') }}" class="nav-link {{ Route::is('dashboard') ? 'active' : '' }}"  style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
                                     <!-- Home / Dashboard Icon -->
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9v9a3 3 0 01-3 3h-3a3 3 0 01-3-3v-6H6a3 3 0 00-3 3v3z"/>
@@ -234,7 +244,12 @@
                                     <span>Businesses</span>
                                 </a>
 
-                                <a href="{{ route('profile.edit') }}" class="nav-link {{ Route::is('profile.*') ? 'active' : '' }}" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                {{-- Notifications --}}
+                                <livewire:sidebar.sidebar-notifications />
+                                {{-- Notifications End --}}
+
+                                {{-- Profile and Settings --}}
+                                <a href="{{ route('profile.edit') }}" class="nav-link {{ Route::is('profile.edit') ? 'active' : '' }}" style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
                                     <!-- User / Profile Icon -->
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                                         <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle>
@@ -307,6 +322,6 @@
             </div>
         </footer>
 
-
+        @livewireScripts
     </body>
 </html>

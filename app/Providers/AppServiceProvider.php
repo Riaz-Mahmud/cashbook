@@ -2,16 +2,17 @@
 
 namespace App\Providers;
 
-use App\Models\Business;
-use App\Policies\BusinessPolicy;
 use App\Models\Book;
-use App\Policies\BookPolicy;
+use App\Models\Business;
 use App\Models\Transaction;
+use App\Policies\BookPolicy;
+use App\Policies\BusinessPolicy;
 use App\Policies\TransactionPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use App\Observers\TransactionObserver;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,11 +30,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-    // Prevent key length issues on older MySQL / MariaDB
-    Schema::defaultStringLength(191);
-    Gate::policy(Business::class, BusinessPolicy::class);
-    Gate::policy(Book::class, BookPolicy::class);
-    Gate::policy(Transaction::class, TransactionPolicy::class);
+        // Prevent key length issues on older MySQL / MariaDB
+        Schema::defaultStringLength(191);
+        Gate::policy(Business::class, BusinessPolicy::class);
+        Gate::policy(Book::class, BookPolicy::class);
+        Gate::policy(Transaction::class, TransactionPolicy::class);
+
+        Transaction::observe(TransactionObserver::class);
+
         View::composer('*', function ($view) {
             $active = null;
             if (Auth::check()) {

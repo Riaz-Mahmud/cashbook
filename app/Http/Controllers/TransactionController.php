@@ -86,6 +86,7 @@ class TransactionController extends Controller
             'category_id' => 'nullable|exists:categories,id',
             'new_category' => 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0.01',
+            'mode' => 'nullable|string|max:50',
             'type' => 'required|in:income,expense',
             'transaction_date' => 'required|date',
             'description' => 'nullable|string',
@@ -143,6 +144,7 @@ class TransactionController extends Controller
             'category_id' => $data['category_id'] ?? null,
             'amount' => $data['amount'],
             'type' => $data['type'],
+            'mode' => $data['mode'] ?? null,
             'transaction_date' => $data['transaction_date'],
             'description' => $data['description'] ?? null,
             'status' => $status,
@@ -164,6 +166,7 @@ class TransactionController extends Controller
                 'amount' => $transaction->amount,
                 'type' => $transaction->type,
                 'status' => $transaction->status,
+                'mode' => $transaction->mode,
                 'book_role' => $bookRole
             ],
         ]);
@@ -296,7 +299,7 @@ class TransactionController extends Controller
             'new_category' => 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0.01',
             'type' => 'required|in:income,expense',
-            'mode' => 'required|string|max:50',
+            'mode' => 'nullable|string|max:50',
             'transaction_date' => 'required|date',
             'description' => 'nullable|string',
             'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
