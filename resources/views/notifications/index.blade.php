@@ -26,7 +26,7 @@
                         {{ $notification->data['message'] }}
                     </p>
                     <p style="color: #a0aec0; font-size: 0.75rem;">
-                        {{ $notification->data['timestamp'] }}
+                        {{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}
                     </p>
                 </div>
                 <a href="{{ $notification->data['link'] }}" style="

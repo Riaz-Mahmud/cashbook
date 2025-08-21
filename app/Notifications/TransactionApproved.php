@@ -18,7 +18,7 @@ class TransactionApproved extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -32,7 +32,21 @@ class TransactionApproved extends Notification implements ShouldQueue
             ->line('Amount: '.$t->amount.' ('.$t->type.')')
             ->line('Book ID: '.$t->book_id)
             ->line('Date: '.$t->transaction_date?->toDateString())
-            ->action('View Transactions', url(route('transactions.index')))
+            ->action('View Transactions', url(route('books.show', ['book' => $t->book_id])))
             ->line('Thanks!');
+    }
+
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'transaction_id' => $this->transaction->id,
+            'amount' => $this->transaction->amount,
+            'type' => $this->transaction->type,
+            'book_id' => $this->transaction->book_id,
+            'transaction_date' => $this->transaction->transaction_date?->toDateString(),
+            'title' => 'Transaction Approved',
+            'message' => 'Your transaction has been approved by the ' . ($this->transaction->user->name ?? 'system'),
+            'link' => route('books.show', ['book' => $this->transaction->book_id]),
+        ];
     }
 }

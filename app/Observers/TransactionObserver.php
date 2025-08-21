@@ -53,7 +53,6 @@ class TransactionObserver
 
     protected function notifyUsers(Transaction $transaction, Notification $notification)
     {
-        Log::info('Notifying users for transaction', ['transaction_id' => $transaction->id]);
         $book = $transaction->book;
         $user = $transaction->user;
 
@@ -61,7 +60,6 @@ class TransactionObserver
         $notifiables = $book->users()->where('users.id', '!=', $user->id)->get();
 
         foreach ($notifiables as $n) {
-            Log::info('Notifying user', ['user_id' => $n->name, 'transaction_id' => $transaction->id]);
             $n->notify($notification);
         }
     }
